@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -e
+
+java -Xmx1G -jar $(dirname $0)/../dist/beta.jar $@
