@@ -7,9 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import se.uu.nlp.dlib.io.CoNLLReader;
-import se.uu.nlp.dlib.io.CoNLLWriter;
-import se.uu.nlp.dlib.tree.Tree;
+import se.uu.nlp.dlib.conll.CoNLLReader;
+import se.uu.nlp.dlib.conll.CoNLLTree;
+import se.uu.nlp.dlib.conll.CoNLLWriter;
 import se.uu.nlp.util.Option;
 import se.uu.nlp.util.OptionException;
 import se.uu.nlp.util.OptionParser;
@@ -70,7 +70,7 @@ public class Main {
 		try {
 			CoNLLReader reader = new CoNLLReader(options.inputFileName);
 			reader.setNormalize();
-			Tree tree;
+			CoNLLTree tree;
 			while ((tree = reader.read()) != null) {
 				modelExtractor.next(tree);
 			}
@@ -107,7 +107,7 @@ public class Main {
 			try {
 				CoNLLReader reader = new CoNLLReader(options.inputFileName);
 				reader.setNormalize();
-				Tree tree;
+				CoNLLTree tree;
 				while ((tree = reader.read()) != null) {
 					trainerHandler.update(tree);
 					progressPrinter.update();
@@ -208,7 +208,7 @@ public class Main {
 			System.exit(1);
 		}
 		try {
-			Tree tree;
+			CoNLLTree tree;
 			while ((tree = reader.read()) != null) {
 				writer.write(parserHandler.next(tree));
 				progressPrinter.update();

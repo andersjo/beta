@@ -3,7 +3,7 @@
  */
 package beta;
 
-import se.uu.nlp.dlib.tree.Tree;
+import se.uu.nlp.dlib.conll.CoNLLTree;
 
 /**
  *
@@ -11,5 +11,5 @@ import se.uu.nlp.dlib.tree.Tree;
  */
 public interface Parser {
 
-	abstract public Tree getBestParse(Tree input);
+	abstract public CoNLLTree getBestParse(CoNLLTree input);
 }

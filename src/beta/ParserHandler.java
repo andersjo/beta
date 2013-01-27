@@ -3,7 +3,7 @@
  */
 package beta;
 
-import se.uu.nlp.dlib.tree.Tree;
+import se.uu.nlp.dlib.conll.CoNLLTree;
 
 /**
  *
@@ -17,8 +17,8 @@ public class ParserHandler {
 		this.parser = parser;
 	}
 
-	public Tree next(Tree tree) {
-		Tree input = new Tree(tree);
+	public CoNLLTree next(CoNLLTree tree) {
+		CoNLLTree input = new CoNLLTree(tree);
 		for (int i = 0; i < input.getNNodes(); i++) {
 			input.heads[i] = 0;
 			input.deprels[i] = Model.UNKNOWN_LABEL;

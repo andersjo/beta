@@ -3,7 +3,7 @@
  */
 package beta;
 
-import se.uu.nlp.dlib.tree.Tree;
+import se.uu.nlp.dlib.conll.CoNLLTree;
 
 /**
  *
@@ -15,7 +15,7 @@ public class EdgeScorer {
 	private final int[][] bestLabels;
 	private final double[][] scoresForBestLabel;
 
-	public EdgeScorer(Model model, Tree graph) {
+	public EdgeScorer(Model model, CoNLLTree graph) {
 		int nNodes = graph.getNNodes();
 
 		EdgeFeaturizer featurizer = new EdgeFeaturizer(model, graph);

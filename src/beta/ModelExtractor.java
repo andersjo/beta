@@ -3,7 +3,7 @@
  */
 package beta;
 
-import se.uu.nlp.dlib.tree.Tree;
+import se.uu.nlp.dlib.conll.CoNLLTree;
 
 /**
  *
@@ -38,7 +38,7 @@ public class ModelExtractor {
 		return nTokens;
 	}
 
-	public Tree next(Tree tree) {
+	public CoNLLTree next(CoNLLTree tree) {
 		for (int i = 0; i < tree.getNNodes(); i++) {
 			model.addWord(tree.forms[i]);
 			model.addTag(tree.postags[i]);

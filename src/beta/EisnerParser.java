@@ -3,7 +3,7 @@
  */
 package beta;
 
-import se.uu.nlp.dlib.tree.Tree;
+import se.uu.nlp.dlib.conll.CoNLLTree;
 
 /**
  *
@@ -18,7 +18,7 @@ public class EisnerParser implements Parser {
 	}
 
 	@Override
-	public Tree getBestParse(Tree input) {
+	public CoNLLTree getBestParse(CoNLLTree input) {
 		int nNodes = input.getNNodes();
 
 		ChoiceChart chart1 = new ChoiceChart(nNodes);
@@ -191,7 +191,7 @@ public class EisnerParser implements Parser {
 			this.choiceR = choiceR;
 		}
 
-		public void updateGraph(Model model, Tree tree) {
+		public void updateGraph(Model model, CoNLLTree tree) {
 			if (src >= 0) {
 				tree.heads[tgt] = src;
 				tree.deprels[tgt] = model.getLabelForCode(lab);

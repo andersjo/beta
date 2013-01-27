@@ -3,7 +3,7 @@
  */
 package beta;
 
-import se.uu.nlp.dlib.tree.Tree;
+import se.uu.nlp.dlib.conll.CoNLLTree;
 
 /**
  * Passive-aggressive training. This is based on the following:
@@ -29,18 +29,18 @@ public class TrainerHandler {
 		this.acc = new double[nFeatures];
 	}
 
-	public void update(Tree tree) {
+	public void update(CoNLLTree tree) {
 		FeatureVector gold = EdgeFeaturizer.getFeatureVector(tree, model);
 
 		int nNodes = tree.getNNodes();
 
-		Tree input = new Tree(tree);
+		CoNLLTree input = new CoNLLTree(tree);
 		for (int i = 0; i < nNodes; i++) {
 			input.heads[i] = 0;
 			input.deprels[i] = Model.UNKNOWN_LABEL;
 		}
 
-		Tree bestParse = parser.getBestParse(input);
+		CoNLLTree bestParse = parser.getBestParse(input);
 		FeatureVector best = EdgeFeaturizer.getFeatureVector(bestParse, model);
 
 		FeatureVector delta = FeatureVector.getDelta(gold, best);
@@ -78,7 +78,7 @@ public class TrainerHandler {
 		return averagedWeightVector;
 	}
 
-	private static double getLoss(Tree gold, Tree best) {
+	private static double getLoss(CoNLLTree gold, CoNLLTree best) {
 		double loss = 2 * (gold.getNNodes() - 1);
 
 		for (int i = 1; i < gold.getNNodes(); i++) {

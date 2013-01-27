@@ -3,7 +3,7 @@
  */
 package beta;
 
-import se.uu.nlp.dlib.tree.Tree;
+import se.uu.nlp.dlib.conll.CoNLLTree;
 
 /**
  *
@@ -19,7 +19,7 @@ public class EdgeFeaturizer {
 	private final int[] pred_t;
 	private final int[] succ_t;
 
-	public EdgeFeaturizer(Model model, Tree tree) {
+	public EdgeFeaturizer(Model model, CoNLLTree tree) {
 		int nNodes = tree.getNNodes();
 
 		this.w = new int[nNodes];
@@ -62,7 +62,7 @@ public class EdgeFeaturizer {
 		return featureVector;
 	}
 
-	public static FeatureVector getFeatureVector(Tree graph, Model model) {
+	public static FeatureVector getFeatureVector(CoNLLTree graph, Model model) {
 		FeatureVector featureVector = new FeatureVector();
 		EdgeFeaturizer featurizer = new EdgeFeaturizer(model, graph);
 		FeatureVectorUpdater updater = new FeatureVectorUpdater(model, featureVector);
