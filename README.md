@@ -105,7 +105,7 @@ You should see the following output:
 
 At this time, Beta is very basic. It only supports the standard first-order feature model of MSTParser and supports neither morphological features, non-projective parsing, nor any other of the enhancements that has shown to increase parsing accuracy. (In case you want to implement any of these, just go ahead!)
 
-The only thing you can try in order to improve parser accuracy at this point is to tweak the number of iterations over the training data. By default, the parser does 1 iteration; but larger values may increase the parsing accuracy – typically up to some local maximum, after which accuracy will decrease again.
+The one thing you can try in order to improve parser accuracy at this point is to tweak the number of iterations over the training data. By default, the parser does 1 iteration; but larger values may increase the parsing accuracy – typically up to some local maximum, after which accuracy will decrease again.
 
 The number of iterations over the training data is specified using the ``-n`` flag. For example, the following command will train the parser using 9 iterations:
 
@@ -120,3 +120,11 @@ When trying to find the best value for ``-n``, you may find it convenient to tra
 ```
 $ bin/beta train -i data/talbanken-dep-train.conll -m MODEL -n 10 -s
 ```
+
+## License
+
+Copyright (c) 2013 Marco Kuhlmann
+
+Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
