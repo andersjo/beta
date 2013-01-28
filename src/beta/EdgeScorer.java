@@ -13,7 +13,6 @@ public class EdgeScorer {
 
 	private final double[][][] scores;
 	private final int[][] bestLabels;
-	private final double[][] scoresForBestLabel;
 
 	public EdgeScorer(Model model, CoNLLTree graph) {
 		int nNodes = graph.getNNodes();
@@ -68,27 +67,21 @@ public class EdgeScorer {
 
 		this.scores = new double[nNodes][nNodes][nLabels];
 		this.bestLabels = new int[nNodes][nNodes];
-		this.scoresForBestLabel = new double[nNodes][nNodes];
 		for (int fst = 0; fst < nNodes; fst++) {
 			for (int snd = fst + 1; snd < nNodes; snd++) {
 				bestLabels[fst][snd] = model.getCodeForDefaultLabel();
 				bestLabels[snd][fst] = model.getCodeForDefaultLabel();
 
-				scoresForBestLabel[fst][snd] = Double.NEGATIVE_INFINITY;
-				scoresForBestLabel[snd][fst] = Double.NEGATIVE_INFINITY;
-
 				for (int lab = 0; lab < nLabels; lab++) {
 					// Edge from fst to snd (RA).
 					scores[fst][snd][lab] = scoresCore[fst][snd] + scoresLabeled[fst][lab][0][1] + scoresLabeled[snd][lab][0][0];
-					if (scores[fst][snd][lab] > scoresForBestLabel[fst][snd]) {
-						scoresForBestLabel[fst][snd] = scores[fst][snd][lab];
+					if (scores[fst][snd][lab] > scores[fst][snd][bestLabels[fst][snd]]) {
 						bestLabels[fst][snd] = lab;
 					}
 
 					// Edge from snd to fst (LA).
 					scores[snd][fst][lab] = scoresCore[snd][fst] + scoresLabeled[snd][lab][1][1] + scoresLabeled[fst][lab][1][0];
-					if (scores[snd][fst][lab] > scoresForBestLabel[snd][fst]) {
-						scoresForBestLabel[snd][fst] = scores[snd][fst][lab];
+					if (scores[snd][fst][lab] > scores[snd][fst][bestLabels[snd][fst]]) {
 						bestLabels[snd][fst] = lab;
 					}
 				}
@@ -108,7 +101,7 @@ public class EdgeScorer {
 
 	public double getScoreForBestLabel(int src, int tgt) {
 		assert src != tgt;
-		return scoresForBestLabel[src][tgt];
+		return scores[src][tgt][bestLabels[src][tgt]];
 	}
 
 	private static class FeatureVectorUpdater implements FeatureHandler {
