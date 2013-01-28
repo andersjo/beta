@@ -18,31 +18,28 @@ public class EdgeScorer {
 		int nNodes = graph.getNNodes();
 
 		EdgeFeaturizer featurizer = new EdgeFeaturizer(model, graph);
+		FeatureVectorUpdater updater = new FeatureVectorUpdater(model);
 
-		FeatureVector[][] vectorsCore = new FeatureVector[nNodes][nNodes];
 		double[][] scoresCore = new double[nNodes][nNodes];
 
 		for (int fst = 0; fst < nNodes; fst++) {
 			for (int snd = fst + 1; snd < nNodes; snd++) {
 				// Edge from fst to snd (RA)
 				FeatureVector vectorRA = new FeatureVector();
-				FeatureVectorUpdater updaterRA = new FeatureVectorUpdater(model, vectorRA);
-				featurizer.featurizeCore(fst, snd, true, updaterRA);
-				vectorsCore[fst][snd] = vectorRA;
+				updater.setClient(vectorRA);
+				featurizer.featurizeCore(fst, snd, true, updater);
 				scoresCore[fst][snd] = vectorRA.getScore(model.getWeightVector());
 
 				// Edge from snd to fst (LA)
 				FeatureVector vectorLA = new FeatureVector();
-				FeatureVectorUpdater updaterLA = new FeatureVectorUpdater(model, vectorLA);
-				featurizer.featurizeCore(fst, snd, false, updaterLA);
-				vectorsCore[snd][fst] = vectorLA;
+				updater.setClient(vectorLA);
+				featurizer.featurizeCore(fst, snd, false, updater);
 				scoresCore[snd][fst] = vectorLA.getScore(model.getWeightVector());
 			}
 		}
 
 		int nLabels = model.getNLabels();
 
-		FeatureVector[][][][] vectorsLabeled = new FeatureVector[nNodes][nLabels][2][2];
 		double[][][][] scoresLabeled = new double[nNodes][nLabels][2][2];
 
 		for (int node = 0; node < nNodes; node++) {
@@ -51,15 +48,13 @@ public class EdgeScorer {
 					boolean isTarget = i == 0;
 
 					FeatureVector vectorRA = new FeatureVector();
-					FeatureVectorUpdater updaterRA = new FeatureVectorUpdater(model, vectorRA);
-					featurizer.featurizeLabeled(node, label, true, isTarget, updaterRA);
-					vectorsLabeled[node][label][0][i] = vectorRA;
+					updater.setClient(vectorRA);
+					featurizer.featurizeLabeled(node, label, true, isTarget, updater);
 					scoresLabeled[node][label][0][i] = vectorRA.getScore(model.getWeightVector());
 
 					FeatureVector vectorLA = new FeatureVector();
-					FeatureVectorUpdater updaterLA = new FeatureVectorUpdater(model, vectorLA);
-					featurizer.featurizeLabeled(node, label, false, isTarget, updaterLA);
-					vectorsLabeled[node][label][1][i] = vectorLA;
+					updater.setClient(vectorLA);
+					featurizer.featurizeLabeled(node, label, false, isTarget, updater);
 					scoresLabeled[node][label][1][i] = vectorLA.getScore(model.getWeightVector());
 				}
 			}
@@ -67,6 +62,7 @@ public class EdgeScorer {
 
 		this.scores = new double[nNodes][nNodes][nLabels];
 		this.bestLabels = new int[nNodes][nNodes];
+		
 		for (int fst = 0; fst < nNodes; fst++) {
 			for (int snd = fst + 1; snd < nNodes; snd++) {
 				bestLabels[fst][snd] = model.getCodeForDefaultLabel();
@@ -107,18 +103,21 @@ public class EdgeScorer {
 	private static class FeatureVectorUpdater implements FeatureHandler {
 
 		private final Model model;
-		private final FeatureVector featureVector;
+		private FeatureVector client;
 
-		public FeatureVectorUpdater(Model model, FeatureVector featureVector) {
+		public FeatureVectorUpdater(Model model) {
 			this.model = model;
-			this.featureVector = featureVector;
+		}
+
+		public void setClient(FeatureVector featureVector) {
+			this.client = featureVector;
 		}
 
 		@Override
 		public void handle(int[] feature) {
 			int index = model.getCodeForFeature(feature);
 			if (index >= 0) {
-				featureVector.increment(index);
+				client.increment(index);
 			}
 		}
 	}
