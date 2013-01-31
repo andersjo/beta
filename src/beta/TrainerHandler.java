@@ -6,10 +6,16 @@ package beta;
 import se.uu.nlp.dlib.conll.CoNLLTree;
 
 /**
- * Passive-aggressive training. This is based on the following:
- *
- * Avihai Mejer and Koby Crammer. Confidence Estimation in Structured
- * Prediction. CoRR abs/1111.1386, 2011.
+ * Train a parsing model.
+ * 
+ * <p>The training method used by this class is passive–aggressive training.
+ * This is described in the following paper:
+ * 
+ * <p>Avihai Mejer and Koby Crammer. Confidence Estimation in Structured
+ * Prediction. CoRR Entry 1111.1386, Technion, Haifa, Israel, 2011.
+ * 
+ * <p>Passive–aggressive training applies essentially the same learning rule as
+ * 1-best MIRA, but is slightly easier to implement.
  *
  * @author Marco Kuhlmann <marco.kuhlmann@lingfil.uu.se>
  */
