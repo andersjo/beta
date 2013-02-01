@@ -97,7 +97,7 @@ public class Main {
 
 		long trainingStarted = System.currentTimeMillis();
 
-		TrainerHandler trainerHandler = new TrainerHandler(model, new EisnerParser(model));
+		TrainerHandler trainerHandler = new TrainerHandler(model, new Parser(model));
 		for (int i = 0; i < options.nIterations; i++) {
 			System.err.format("Iteration %d of %d.%n", i + 1, options.nIterations);
 
@@ -188,7 +188,7 @@ public class Main {
 
 		long parsingStarted = System.currentTimeMillis();
 
-		ParserHandler parserHandler = new ParserHandler(new EisnerParser(model));
+		ParserHandler parserHandler = new ParserHandler(new Parser(model));
 		ProgressPrinter progressPrinter = new ProgressPrinter();
 
 		CoNLLReader reader = null;
