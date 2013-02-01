@@ -3,6 +3,7 @@
  */
 package beta;
 
+import beta.MSTParserExtractor.Emitter;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.io.*;
 
@@ -39,7 +40,7 @@ public class FeatureTrie {
 				node = child;
 			}
 		}
-		if (node.index < 0) {
+		if (node.index == NO_ELEMENT) {
 			node.index = nEntries;
 			last.next = node;
 			last = node;
@@ -101,6 +102,25 @@ public class FeatureTrie {
 				}
 			}
 		}
+
+		public int[] getKey() {
+			FeatureNode node = this;
+			int depth = 0;
+			while (node.parent != null) {
+				node = node.parent;
+				depth++;
+			}
+
+			int[] key = new int[depth];
+			node = this;
+			while (node.parent != null) {
+				depth--;
+				key[depth] = node.childIndex;
+				node = node.parent;
+			}
+
+			return key;
+		}
 	}
 
 	public void save(String fileName) throws IOException {
@@ -147,5 +167,26 @@ public class FeatureTrie {
 			featureTrie.add(key);
 		}
 		return featureTrie;
+	}
+
+	public void dump(Model model, String fileName) throws IOException {
+		dump(model, new File(fileName));
+	}
+
+	public void dump(Model model, File file) throws IOException {
+		Emitter emitter = new MSTParserExtractor.Emitter(model, file);
+		FeatureNode node = sentinel.next;
+		while (node != null) {
+			emitter.write(Integer.toString(node.index) + " [");
+			int[] key = node.getKey();
+			emitter.write(Integer.toString(key[0]));
+			for (int i = 1; i < key.length; i++) {
+				emitter.write(" " + Integer.toString(key[i]));
+			}
+			emitter.write("] ");
+			emitter.handle(node.getKey());
+			node = node.next;
+		}
+		emitter.close();
 	}
 }

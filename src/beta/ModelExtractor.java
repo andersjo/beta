@@ -3,6 +3,7 @@
  */
 package beta;
 
+import se.uu.nlp.dlib.conll.CoNLLReader;
 import se.uu.nlp.dlib.conll.CoNLLTree;
 
 /**
@@ -39,23 +40,26 @@ public class ModelExtractor {
 	}
 
 	public CoNLLTree next(CoNLLTree tree) {
+		CoNLLTree input = new CoNLLTree(tree);
 		for (int i = 0; i < tree.getNNodes(); i++) {
-			model.addWord(tree.forms[i]);
-			model.addTag(tree.postags[i]);
-			if (i > 0) {
-				model.addLabel(tree.deprels[i]);
-			}
+			input.forms[i] = CoNLLReader.normalize(tree.forms[i]);
+			input.lemmas[i] = CoNLLReader.normalize(tree.lemmas[i]);
+
+			model.addWord(input.forms[i]);
+			model.addTag(input.postags[i]);
+			model.addLabel(input.deprels[i]);
 		}
+
 		nTrees++;
-		nTokens += tree.getNNodes() - 1;
+		nTokens += input.getNNodes() - 1;
 
-		EdgeFeaturizer featurizer = new EdgeFeaturizer(model, tree);
-		for (int i = 1; i < tree.getNNodes(); i++) {
-			int label = model.getCodeForLabel(tree.deprels[i]);
-			featurizer.featurize(tree.heads[i], i, label, modelUpdater);
+		EdgeFeaturizer featurizer = new EdgeFeaturizer(model, input);
+		for (int i = 1; i < input.getNNodes(); i++) {
+			int label = model.getCodeForLabel(input.deprels[i]);
+			featurizer.featurize(input.heads[i], i, label, modelUpdater);
 		}
 
-		return tree;
+		return input;
 	}
 
 	private static class ModelUpdater implements FeatureHandler {

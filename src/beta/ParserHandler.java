@@ -3,6 +3,7 @@
  */
 package beta;
 
+import se.uu.nlp.dlib.conll.CoNLLReader;
 import se.uu.nlp.dlib.conll.CoNLLTree;
 
 /**
@@ -22,7 +23,16 @@ public class ParserHandler {
 		for (int i = 0; i < input.getNNodes(); i++) {
 			input.heads[i] = 0;
 			input.deprels[i] = Model.UNKNOWN_LABEL;
+			input.forms[i] = CoNLLReader.normalize(input.forms[i]);
+			input.lemmas[i] = CoNLLReader.normalize(input.lemmas[i]);
 		}
-		return parser.getBestParse(input);
+
+		CoNLLTree best = parser.getBestParse(input);
+		for (int i = 0; i < tree.getNNodes(); i++) {
+			best.forms[i] = tree.forms[i];
+			best.lemmas[i] = tree.lemmas[i];
+		}
+		
+		return best;
 	}
 }
