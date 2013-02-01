@@ -3,7 +3,6 @@
  */
 package beta;
 
-import beta.MSTParserExtractor.Emitter;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.io.*;
 
@@ -167,26 +166,5 @@ public class FeatureTrie {
 			featureTrie.add(key);
 		}
 		return featureTrie;
-	}
-
-	public void dump(Model model, String fileName) throws IOException {
-		dump(model, new File(fileName));
-	}
-
-	public void dump(Model model, File file) throws IOException {
-		Emitter emitter = new MSTParserExtractor.Emitter(model, file);
-		FeatureNode node = sentinel.next;
-		while (node != null) {
-			emitter.write(Integer.toString(node.index) + " [");
-			int[] key = node.getKey();
-			emitter.write(Integer.toString(key[0]));
-			for (int i = 1; i < key.length; i++) {
-				emitter.write(" " + Integer.toString(key[i]));
-			}
-			emitter.write("] ");
-			emitter.handle(node.getKey());
-			node = node.next;
-		}
-		emitter.close();
 	}
 }

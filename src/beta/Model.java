@@ -201,22 +201,4 @@ public class Model {
 		}
 		return weightVector;
 	}
-
-	public void dumpFeatureTrie(String fileName) throws IOException {
-		dumpFeatureTrie(new File(fileName));
-	}
-
-	public void dumpFeatureTrie(File file) throws IOException {
-		features.dump(this, file);
-	}
-
-	public void dumpWordTable(String fileName) throws IOException {
-		dumpWordTable(new File(fileName));
-	}
-
-	public void dumpWordTable(File file) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-		saveTable(words, writer);
-		writer.close();
-	}
 }

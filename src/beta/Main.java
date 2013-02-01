@@ -3,7 +3,6 @@
  */
 package beta;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
@@ -68,31 +67,17 @@ public class Main {
 		System.err.format("Reading from %s ...", options.inputFileName);
 
 		ModelExtractor modelExtractor = new ModelExtractor();
-		MSTParserExtractor extractor = null;
-		try {
-			extractor = new MSTParserExtractor(modelExtractor.getModel(), new File("beta.features"));
-		} catch (IOException e) {
-			System.err.format("Could not initialize the extractor.%n");
-			System.exit(1);
-		}
 		try {
 			CoNLLReader reader = new CoNLLReader(options.inputFileName);
 			CoNLLTree tree;
 			while ((tree = reader.read()) != null) {
 				modelExtractor.next(tree);
-				extractor.next(tree);
 			}
 		} catch (FileNotFoundException e) {
 			System.err.format("File not found: %s%n", options.inputFileName);
 			System.exit(1);
 		} catch (IOException e) {
 			System.err.format("Error while reading from %s%n", options.inputFileName);
-			System.exit(1);
-		}
-		try {
-			extractor.exit();
-		} catch (IOException e) {
-			System.err.format("Could not close the extractor.%n");
 			System.exit(1);
 		}
 
@@ -107,21 +92,6 @@ public class Main {
 		int nFeatures = model.getNFeatures();
 		System.err.format("Found %d trees, %d word forms, %d tags, and %d edge labels.%n", nTrees, nWords, nTags, nLabels);
 		System.err.format("Extracted %d features.%n", nFeatures);
-
-		try {
-			System.err.format("Dump the word table.%n");
-			model.dumpWordTable("beta.words");
-		} catch (IOException e) {
-			System.err.format("Could not dump the word table.%n");
-			System.exit(1);
-		}
-		try {
-			System.err.format("Dump the feature trie.%n");
-			model.dumpFeatureTrie("beta.dump");
-		} catch (IOException e) {
-			System.err.format("Could not dump the feature trie.%n");
-			System.exit(1);
-		}
 
 		System.err.println("Training ...");
 
