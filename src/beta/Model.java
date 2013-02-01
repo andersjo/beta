@@ -23,7 +23,7 @@ public class Model {
 		this.words = new Table<String>();
 		this.tags = new Table<String>();
 		this.labels = new Table<String>();
-		this.features = new FeatureTrie();
+		this.features = new FeatureTrie(33);
 		this.weightVector = null;
 	}
 
