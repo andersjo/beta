@@ -42,7 +42,7 @@ public class FeatureTrie {
 				node = child;
 			}
 		}
-		if (node.index < 0) {
+		if (node.index == NO_ELEMENT) {
 			node.index = nEntries;
 			last.next = node;
 			last = node;
