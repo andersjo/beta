@@ -3,8 +3,8 @@
  */
 package beta;
 
+import beta.util.Table;
 import java.io.*;
-import se.uu.nlp.util.Table;
 
 /**
  *

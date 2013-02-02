@@ -3,16 +3,16 @@
  */
 package beta;
 
+import beta.io.CoNLLReader;
+import beta.io.CoNLLTree;
+import beta.io.CoNLLWriter;
+import beta.util.Option;
+import beta.util.OptionException;
+import beta.util.OptionParser;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import se.uu.nlp.dlib.conll.CoNLLReader;
-import se.uu.nlp.dlib.conll.CoNLLTree;
-import se.uu.nlp.dlib.conll.CoNLLWriter;
-import se.uu.nlp.util.Option;
-import se.uu.nlp.util.OptionException;
-import se.uu.nlp.util.OptionParser;
 
 /**
  * Command-line interface.

@@ -3,7 +3,8 @@
  */
 package beta;
 
-import se.uu.nlp.dlib.conll.CoNLLTree;
+import beta.io.CoNLLTree;
+
 
 /**
  * Score an edge in a dependency graph.
