@@ -1,7 +1,7 @@
 /*
  * See the file "LICENSE" for the full license governing this code.
  */
-package beta.io;
+package beta.conll;
 
 import java.io.BufferedWriter;
 import java.io.File;

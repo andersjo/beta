@@ -3,7 +3,6 @@
  */
 package beta;
 
-import beta.util.Table;
 import java.io.*;
 
 /**

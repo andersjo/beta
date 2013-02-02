@@ -1,7 +1,7 @@
 /*
  * See the file "LICENSE" for the full license governing this code.
  */
-package beta.util;
+package beta.options;
 
 /**
  *

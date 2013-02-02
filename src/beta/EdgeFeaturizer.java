@@ -3,7 +3,7 @@
  */
 package beta;
 
-import beta.io.CoNLLTree;
+import beta.conll.CoNLLTree;
 
 /**
  *

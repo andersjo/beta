@@ -3,12 +3,12 @@
  */
 package beta;
 
-import beta.io.CoNLLReader;
-import beta.io.CoNLLTree;
-import beta.io.CoNLLWriter;
-import beta.util.Option;
-import beta.util.OptionException;
-import beta.util.OptionParser;
+import beta.conll.CoNLLReader;
+import beta.conll.CoNLLTree;
+import beta.conll.CoNLLWriter;
+import beta.options.Option;
+import beta.options.OptionException;
+import beta.options.OptionParser;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
