@@ -69,7 +69,6 @@ public class Main {
 		ModelExtractor modelExtractor = new ModelExtractor();
 		try {
 			CoNLLReader reader = new CoNLLReader(options.inputFileName);
-			reader.setNormalize();
 			CoNLLTree tree;
 			while ((tree = reader.read()) != null) {
 				modelExtractor.next(tree);
@@ -106,7 +105,6 @@ public class Main {
 
 			try {
 				CoNLLReader reader = new CoNLLReader(options.inputFileName);
-				reader.setNormalize();
 				CoNLLTree tree;
 				while ((tree = reader.read()) != null) {
 					trainerHandler.update(tree);

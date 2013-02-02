@@ -40,10 +40,6 @@ public class CoNLLReader {
 	 * The internal reader.
 	 */
 	private final BufferedReader reader;
-	/**
-	 * Whether to apply normalization.
-	 */
-	private boolean normalize;
 
 	/**
 	 * Creates a tree reader.
@@ -76,10 +72,6 @@ public class CoNLLReader {
 	 */
 	public CoNLLReader(String fileName) throws FileNotFoundException {
 		this.reader = new BufferedReader(new FileReader(fileName));
-	}
-
-	public void setNormalize() {
-		this.normalize = true;
 	}
 
 	/**
