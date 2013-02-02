@@ -5,16 +5,15 @@ package beta;
 
 import beta.conll.CoNLLTree;
 
-
 /**
  * Train a parsing model.
- * 
- * <p>The training method used by this class is passive–aggressive training.
- * This is described in the following paper:
- * 
+ *
+ * <p>The training method used by this class is passive–aggressive training as
+ * described in the following paper:
+ *
  * <p>Avihai Mejer and Koby Crammer. Confidence Estimation in Structured
  * Prediction. CoRR Entry 1111.1386, Technion, Haifa, Israel, 2011.
- * 
+ *
  * <p>Passive–aggressive training applies essentially the same learning rule as
  * 1-best MIRA, but is slightly easier to implement.
  *

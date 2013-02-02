@@ -2,4 +2,4 @@
 
 set -e
 
-java -Xmx1G -jar $(dirname $0)/../dist/beta.jar $@
+java -Xmx2G -jar $(dirname $0)/../dist/beta.jar $@

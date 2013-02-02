@@ -74,11 +74,11 @@ public class Main {
 				modelExtractor.next(tree);
 			}
 		} catch (FileNotFoundException e) {
-			System.err.format("File not found: %s%n", options.inputFileName);
-			System.exit(1);
+			System.err.println();
+			failWithFileNotFoundException(options.inputFileName);
 		} catch (IOException e) {
-			System.err.format("Error while reading from %s%n", options.inputFileName);
-			System.exit(1);
+			System.err.println();
+			failWithIOException(options.inputFileName);
 		}
 
 		System.err.println(" done.");
@@ -112,11 +112,9 @@ public class Main {
 				}
 				reader.close();
 			} catch (FileNotFoundException e) {
-				System.err.format("File not found: %s%n", options.inputFileName);
-				System.exit(1);
+				failWithFileNotFoundException(options.inputFileName);
 			} catch (IOException e) {
-				System.err.format("Error while reading from %s%n", options.inputFileName);
-				System.exit(1);
+				failWithIOException(options.inputFileName);
 			}
 
 			progressPrinter.exit();
@@ -130,8 +128,8 @@ public class Main {
 				try {
 					intermediateModel.save(intermediateFile);
 				} catch (IOException e) {
-					System.err.format("Error writing to %s%n", intermediateFile);
-					System.exit(1);
+					System.err.println();
+					failWithIOException(intermediateFile);
 				}
 				System.err.format(" %s%n", intermediateFile);
 			}
@@ -145,8 +143,8 @@ public class Main {
 		try {
 			model.save(options.modelFileName);
 		} catch (IOException e) {
-			System.err.format("Error writing to %s%n", options.modelFileName);
-			System.exit(1);
+			System.err.println();
+			failWithIOException(options.modelFileName);
 		}
 		System.err.format(" %s%n", options.modelFileName);
 	}
@@ -178,9 +176,12 @@ public class Main {
 		Model model = null;
 		try {
 			model = Model.load(options.modelFileName);
+		} catch (FileNotFoundException e) {
+			System.err.println();
+			failWithFileNotFoundException(options.modelFileName);
 		} catch (IOException e) {
-			System.err.format("Error while reading from %s%n", options.modelFileName);
-			System.exit(1);
+			System.err.println();
+			failWithIOException(options.modelFileName);
 		}
 		System.err.println(" done.");
 
@@ -188,47 +189,44 @@ public class Main {
 
 		long parsingStarted = System.currentTimeMillis();
 
-		ParserHandler parserHandler = new ParserHandler(new Parser(model));
+		Parser parser = new Parser(model);
 		ProgressPrinter progressPrinter = new ProgressPrinter();
 
 		CoNLLReader reader = null;
 		try {
 			reader = new CoNLLReader(options.inputFileName);
 		} catch (FileNotFoundException e) {
-			System.err.format("File not found: %s%n", options.inputFileName);
-			System.exit(1);
+			failWithFileNotFoundException(options.inputFileName);
 		}
 		CoNLLWriter writer = null;
 		try {
 			writer = new CoNLLWriter(options.outputFileName);
 		} catch (IOException e) {
-			System.err.format("Error while writing to %s%n", options.outputFileName);
-			System.exit(1);
+			failWithIOException(options.outputFileName);
 		}
 		try {
 			CoNLLTree tree;
 			while ((tree = reader.read()) != null) {
-				writer.write(parserHandler.next(tree));
+				writer.write(parser.getBestParse(tree));
 				progressPrinter.update();
 			}
 		} catch (IOException e) {
-			System.err.format("Error while reading from %s%n", options.inputFileName);
-			System.exit(1);
+			System.err.println();
+			failWithIOException(options.inputFileName);
 		}
+
+		progressPrinter.exit();
+
 		try {
 			reader.close();
 		} catch (IOException e) {
-			System.err.format("Error while closing %s%n", options.inputFileName);
-			System.exit(1);
+			failWithIOException(options.inputFileName);
 		}
 		try {
 			writer.close();
 		} catch (IOException e) {
-			System.err.format("Error while closing %s%n", options.outputFileName);
-			System.exit(1);
+			failWithIOException(options.outputFileName);
 		}
-
-		progressPrinter.exit();
 
 		System.err.println("Finished parsing.");
 
@@ -253,5 +251,17 @@ public class Main {
 		tmp -= TimeUnit.MINUTES.toMillis(minutes);
 		long seconds = TimeUnit.MILLISECONDS.toSeconds(tmp);
 		return String.format("%d:%02d:%02d", hours, minutes, seconds);
+	}
+
+	private static void failWithFileNotFoundException(String fileName) {
+		System.err.println();
+		System.err.format("File not found: %s%n", fileName);
+		System.exit(1);
+	}
+
+	private static void failWithIOException(String fileName) {
+		System.err.println();
+		System.err.format("I/O error while processing %s%n", fileName);
+		System.exit(1);
 	}
 }
