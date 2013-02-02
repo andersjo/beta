@@ -15,13 +15,13 @@ This section describes the basic usage of Beta.
 Binary releases of Beta are available via the [Downloads section](https://bitbucket.org/kuhlmann/beta/downloads) of the project site. Once you have downloaded a release, unpack it at a location of your choice:
 
 ```
-$ tar xzf beta-1.0.tar.gz
+$ tar xzf beta-VERSION.tar.gz
 ```
 
-This will create a new directory ``beta-1.0``. Enter that directory:
+This will create a new directory ``beta-VERSION``. Enter that directory:
 
 ```
-$ cd beta-1.0
+$ cd beta-VERSION
 ```
 
 You should now be able to run Beta by typing the command
@@ -58,7 +58,7 @@ Iteration 1 of 1.
 .......... (4000)
 .........
 Finished training.
-Training took 0:00:58.
+Training took 0:00:44.
 Saving the final model ... MODEL
 ```
 
@@ -82,7 +82,7 @@ Parsing ...
 .......... (1000)
 ..
 Finished parsing.
-Parsing took 0:00:13.
+Parsing took 0:00:10.
 ```
 
 ### Evaluating parser accuracy
