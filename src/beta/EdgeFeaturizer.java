@@ -99,47 +99,47 @@ public class EdgeFeaturizer {
 
 		for (int mid = fst + 1; mid < snd; mid++) {
 			int mid_t = t[mid];
-			h.handle(100, fst_t, snd_t, mid_t);
-			h.handle(100, fst_t, snd_t, mid_t, attDist);
+			h.handle(0, fst_t, snd_t, mid_t);
+			h.handle(0, fst_t, snd_t, mid_t, attDist);
 		}
 
 		// addCorePosFeatures
 
-		h.handle(101, fst_pred_t, fst_t, snd_t);
-		h.handle(101, fst_pred_t, fst_t, snd_t, attDist);
+		h.handle(1, fst_pred_t, fst_t, snd_t);
+		h.handle(1, fst_pred_t, fst_t, snd_t, attDist);
 
-		h.handle(102, fst_pred_t, fst_t, snd_t, snd_succ_t);
-		h.handle(102, fst_pred_t, fst_t, snd_t, snd_succ_t, attDist);
+		h.handle(2, fst_pred_t, fst_t, snd_t, snd_succ_t);
+		h.handle(2, fst_pred_t, fst_t, snd_t, snd_succ_t, attDist);
 
-		h.handle(103, fst_pred_t, snd_t, snd_succ_t);
-		h.handle(103, fst_pred_t, snd_t, snd_succ_t, attDist);
+		h.handle(3, fst_pred_t, snd_t, snd_succ_t);
+		h.handle(3, fst_pred_t, snd_t, snd_succ_t, attDist);
 
-		h.handle(104, fst_pred_t, fst_t, snd_succ_t);
-		h.handle(104, fst_pred_t, fst_t, snd_succ_t, attDist);
+		h.handle(4, fst_pred_t, fst_t, snd_succ_t);
+		h.handle(4, fst_pred_t, fst_t, snd_succ_t, attDist);
 
-		h.handle(105, fst_t, snd_t, snd_succ_t);
-		h.handle(105, fst_t, snd_t, snd_succ_t, attDist);
+		h.handle(5, fst_t, snd_t, snd_succ_t);
+		h.handle(5, fst_t, snd_t, snd_succ_t, attDist);
 
-		h.handle(106, fst_t, fst_succ_t, snd_pred_t);
-		h.handle(106, fst_t, fst_succ_t, snd_pred_t, attDist);
+		h.handle(6, fst_t, fst_succ_t, snd_pred_t);
+		h.handle(6, fst_t, fst_succ_t, snd_pred_t, attDist);
 
-		h.handle(107, fst_t, fst_succ_t, snd_pred_t, snd_t);
-		h.handle(107, fst_t, fst_succ_t, snd_pred_t, snd_t, attDist);
+		h.handle(7, fst_t, fst_succ_t, snd_pred_t, snd_t);
+		h.handle(7, fst_t, fst_succ_t, snd_pred_t, snd_t, attDist);
 
-		h.handle(108, fst_t, fst_succ_t, snd_t);
-		h.handle(108, fst_t, fst_succ_t, snd_t, attDist);
+		h.handle(8, fst_t, fst_succ_t, snd_t);
+		h.handle(8, fst_t, fst_succ_t, snd_t, attDist);
 
-		h.handle(109, fst_t, snd_pred_t, snd_t);
-		h.handle(109, fst_t, snd_pred_t, snd_t, attDist);
+		h.handle(9, fst_t, snd_pred_t, snd_t);
+		h.handle(9, fst_t, snd_pred_t, snd_t, attDist);
 
-		h.handle(110, fst_succ_t, snd_pred_t, snd_t);
-		h.handle(110, fst_succ_t, snd_pred_t, snd_t, attDist);
+		h.handle(10, fst_succ_t, snd_pred_t, snd_t);
+		h.handle(10, fst_succ_t, snd_pred_t, snd_t, attDist);
 
-		h.handle(111, fst_pred_t, fst_t, snd_pred_t, snd_t);
-		h.handle(111, fst_pred_t, fst_t, snd_pred_t, snd_t, attDist);
+		h.handle(11, fst_pred_t, fst_t, snd_pred_t, snd_t);
+		h.handle(11, fst_pred_t, fst_t, snd_pred_t, snd_t, attDist);
 
-		h.handle(112, fst_t, fst_succ_t, snd_t, snd_succ_t);
-		h.handle(112, fst_t, fst_succ_t, snd_t, snd_succ_t, attDist);
+		h.handle(12, fst_t, fst_succ_t, snd_t, snd_succ_t);
+		h.handle(12, fst_t, fst_succ_t, snd_t, snd_succ_t, attDist);
 
 		//
 
@@ -153,44 +153,44 @@ public class EdgeFeaturizer {
 
 		// addTwoObsFeatures
 
-		h.handle(113, src_w);
-		h.handle(113, src_w, attDist);
+		h.handle(13, src_w);
+		h.handle(13, src_w, attDist);
 
-		h.handle(114, src_w, src_t);
-		h.handle(114, src_w, src_t, attDist);
+		h.handle(14, src_w, src_t);
+		h.handle(14, src_w, src_t, attDist);
 
-		h.handle(115, src_w, src_t, tgt_t);
-		h.handle(115, src_w, src_t, tgt_t, attDist);
+		h.handle(15, src_w, src_t, tgt_t);
+		h.handle(15, src_w, src_t, tgt_t, attDist);
 
-		h.handle(116, src_w, src_t, tgt_t, tgt_w);
-		h.handle(116, src_w, src_t, tgt_t, tgt_w, attDist);
+		h.handle(16, src_w, src_t, tgt_t, tgt_w);
+		h.handle(16, src_w, src_t, tgt_t, tgt_w, attDist);
 
-		h.handle(117, src_w, tgt_w);
-		h.handle(117, src_w, tgt_w, attDist);
+		h.handle(17, src_w, tgt_w);
+		h.handle(17, src_w, tgt_w, attDist);
 
-		h.handle(118, src_w, tgt_t);
-		h.handle(118, src_w, tgt_t, attDist);
+		h.handle(18, src_w, tgt_t);
+		h.handle(18, src_w, tgt_t, attDist);
 
-		h.handle(119, src_t, tgt_w);
-		h.handle(119, src_t, tgt_w, attDist);
+		h.handle(19, src_t, tgt_w);
+		h.handle(19, src_t, tgt_w, attDist);
 
-		h.handle(120, src_t, tgt_w, tgt_t);
-		h.handle(120, src_t, tgt_w, tgt_t, attDist);
+		h.handle(20, src_t, tgt_w, tgt_t);
+		h.handle(20, src_t, tgt_w, tgt_t, attDist);
 
-		h.handle(121, src_t, tgt_t);
-		h.handle(121, src_t, tgt_t, attDist);
+		h.handle(21, src_t, tgt_t);
+		h.handle(21, src_t, tgt_t, attDist);
 
-		h.handle(122, tgt_w, tgt_t);
-		h.handle(122, tgt_w, tgt_t, attDist);
+		h.handle(22, tgt_w, tgt_t);
+		h.handle(22, tgt_w, tgt_t, attDist);
 
-		h.handle(123, src_t);
-		h.handle(123, src_t, attDist);
+		h.handle(23, src_t);
+		h.handle(23, src_t, attDist);
 
-		h.handle(124, tgt_w);
-		h.handle(124, tgt_w, attDist);
+		h.handle(24, tgt_w);
+		h.handle(24, tgt_w, attDist);
 
-		h.handle(125, tgt_t);
-		h.handle(125, tgt_t, attDist);
+		h.handle(25, tgt_t);
+		h.handle(25, tgt_t, attDist);
 	}
 
 	public void featurizeLabeled(int node, int label, boolean isRA, boolean isTarget, FeatureHandler h) {
@@ -201,26 +201,26 @@ public class EdgeFeaturizer {
 		int node_pred_t = pred_t[node];
 		int node_succ_t = succ_t[node];
 
-		h.handle(200, label);
-		h.handle(200, label, suffix);
+		h.handle(26, label);
+		h.handle(26, label, suffix);
 
-		h.handle(201, node_w, node_t, label);
-		h.handle(201, node_w, node_t, label, suffix);
+		h.handle(27, node_w, node_t, label);
+		h.handle(27, node_w, node_t, label, suffix);
 
-		h.handle(202, node_t, label);
-		h.handle(202, node_t, label, suffix);
+		h.handle(28, node_t, label);
+		h.handle(28, node_t, label, suffix);
 
-		h.handle(203, node_pred_t, node_t, label);
-		h.handle(203, node_pred_t, node_t, label, suffix);
+		h.handle(29, node_pred_t, node_t, label);
+		h.handle(29, node_pred_t, node_t, label, suffix);
 
-		h.handle(204, node_t, node_succ_t, label);
-		h.handle(204, node_t, node_succ_t, label, suffix);
+		h.handle(30, node_t, node_succ_t, label);
+		h.handle(30, node_t, node_succ_t, label, suffix);
 
-		h.handle(205, node_pred_t, node_t, node_succ_t, label);
-		h.handle(205, node_pred_t, node_t, node_succ_t, label, suffix);
+		h.handle(31, node_pred_t, node_t, node_succ_t, label);
+		h.handle(31, node_pred_t, node_t, node_succ_t, label, suffix);
 
-		h.handle(206, node_w, label);
-		h.handle(206, node_w, label, suffix);
+		h.handle(32, node_w, label);
+		h.handle(32, node_w, label, suffix);
 	}
 
 	private static class FeatureVectorUpdater implements FeatureHandler {

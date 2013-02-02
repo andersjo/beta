@@ -14,13 +14,16 @@ public class FeatureTrie {
 
 	private static final TIntObjectHashMap<FeatureNode> NULL_MAP = new TIntObjectHashMap<FeatureNode>();
 	private static final int NO_ELEMENT = -1;
-	private final FeatureNode root;
+	private final FeatureNode[] roots;
 	private final FeatureNode sentinel;
 	private int nEntries;
 	private FeatureNode last;
 
-	public FeatureTrie() {
-		this.root = new FeatureNode(null, 0);
+	public FeatureTrie(int size) {
+		this.roots = new FeatureNode[size];
+		for (int i = 0; i < size; i++) {
+			roots[i] = new FeatureNode(null, i);
+		}
 		this.sentinel = new FeatureNode(null, 0);
 		this.last = sentinel;
 	}
@@ -30,8 +33,8 @@ public class FeatureTrie {
 	}
 
 	public int add(int[] key) {
-		FeatureNode node = root;
-		for (int i = 0; i < key.length; i++) {
+		FeatureNode node = roots[key[0]];
+		for (int i = 1; i < key.length; i++) {
 			FeatureNode child = node.getChild(key[i]);
 			if (child == null) {
 				node = node.addChild(key[i]);
@@ -49,8 +52,8 @@ public class FeatureTrie {
 	}
 
 	public int get(int[] key) {
-		FeatureNode node = root;
-		for (int i = 0; i < key.length; i++) {
+		FeatureNode node = roots[key[0]];
+		for (int i = 1; i < key.length; i++) {
 			FeatureNode child = node.getChild(key[i]);
 			if (child == null) {
 				return NO_ELEMENT;
@@ -92,13 +95,9 @@ public class FeatureTrie {
 		@Override
 		public String toString() {
 			if (parent == null) {
-				return "";
+				return Integer.toString(childIndex);
 			} else {
-				if (parent.parent == null) {
-					return Integer.toString(childIndex);
-				} else {
-					return parent.toString() + " " + Integer.toString(childIndex);
-				}
+				return parent.toString() + " " + Integer.toString(childIndex);
 			}
 		}
 	}
@@ -114,6 +113,8 @@ public class FeatureTrie {
 	}
 
 	public void save(BufferedWriter bw) throws IOException {
+		bw.write(Integer.toString(roots.length));
+		bw.newLine();
 		bw.write(Integer.toString(nEntries));
 		bw.newLine();
 		FeatureNode current = sentinel.next;
@@ -136,7 +137,8 @@ public class FeatureTrie {
 	}
 
 	public static FeatureTrie load(BufferedReader br) throws IOException {
-		FeatureTrie featureTrie = new FeatureTrie();
+		int size = Integer.parseInt(br.readLine());
+		FeatureTrie featureTrie = new FeatureTrie(size);
 		int nEntries = Integer.parseInt(br.readLine());
 		for (int i = 0; i < nEntries; i++) {
 			String tokens[] = br.readLine().split(" ");
