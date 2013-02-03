@@ -1,0 +1,4 @@
+CoNLL Shared Task 2009
+
+Catalan: 80.99% (85.89%) – Best 87.86%, P-columns 86.13%
+English: 87.14% (90.00%) – Best 89.88%, P-columns 85.50%
