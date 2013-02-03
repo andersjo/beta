@@ -65,7 +65,7 @@ public class EdgeScorer {
 		// the arc is a RA or a LA. The tgt component specifies whether the
 		// node is the target or the source of the edge.
 
-		int nLabels = model.getNLabels();
+		int nLabels = model.getNDeprels();
 
 		double[][][][] scoresLabeled = new double[nNodes][nLabels][2][2];
 
@@ -94,8 +94,8 @@ public class EdgeScorer {
 
 		for (int fst = 0; fst < nNodes; fst++) {
 			for (int snd = fst + 1; snd < nNodes; snd++) {
-				bestLabels[fst][snd] = model.getCodeForDefaultLabel();
-				bestLabels[snd][fst] = model.getCodeForDefaultLabel();
+				bestLabels[fst][snd] = model.getCodeForDefaultDeprel();
+				bestLabels[snd][fst] = model.getCodeForDefaultDeprel();
 
 				double bestScoreRA = Double.NEGATIVE_INFINITY;
 				double bestScoreLA = Double.NEGATIVE_INFINITY;

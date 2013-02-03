@@ -32,7 +32,7 @@ public class Parser {
 
 		EdgeScorer scorer = new EdgeScorer(model, input);
 
-		int nLabels = model.getNLabels();
+		int nLabels = model.getNDeprels();
 
 		for (int h = 0; h < nNodes; h++) {
 			score1.set(h, h, 0.0);
@@ -193,7 +193,7 @@ public class Parser {
 		public void updateGraph(Model model, CoNLLTree tree) {
 			if (src >= 0) {
 				tree.heads[tgt] = src;
-				tree.deprels[tgt] = model.getLabelForCode(lab);
+				tree.deprels[tgt] = model.getDeprelForCode(lab);
 			}
 			if (choiceL != null) {
 				choiceL.updateGraph(model, tree);

@@ -12,89 +12,129 @@ import java.io.*;
 public class Model {
 
 	public static final String UNKNOWN_LABEL = "ROOT";
-	private final Table<String> words;
-	private final Table<String> tags;
-	private final Table<String> labels;
+	private final Table<String> forms;
+	private final Table<String> lemmas;
+	private final Table<String> cpostags;
+	private final Table<String> postags;
+	private final Table<String> deprels;
 	private final FeatureTrie features;
 	private double[] weightVector;
 
 	public Model() {
-		this.words = new Table<String>();
-		this.tags = new Table<String>();
-		this.labels = new Table<String>();
-		this.features = new FeatureTrie(33);
+		this.forms = new Table<String>();
+		this.lemmas = new Table<String>();
+		this.cpostags = new Table<String>();
+		this.postags = new Table<String>();
+		this.deprels = new Table<String>();
+		this.features = new FeatureTrie(85);
 		this.weightVector = null;
 	}
 
 	public Model(Model model) {
-		this.words = model.words;
-		this.tags = model.tags;
-		this.labels = model.labels;
+		this.forms = model.forms;
+		this.lemmas = model.lemmas;
+		this.cpostags = model.cpostags;
+		this.postags = model.postags;
+		this.deprels = model.deprels;
 		this.features = model.features;
 		this.weightVector = new double[model.getNFeatures()];
 	}
 
-	private Model(Table<String> words, Table<String> tags, Table<String> labels, FeatureTrie features, double[] weightVector) {
-		this.words = words;
-		this.tags = tags;
-		this.labels = labels;
+	private Model(Table<String> forms, Table<String> lemmas, Table<String> cpostags, Table<String> postags, Table<String> deprels, FeatureTrie features, double[] weightVector) {
+		this.forms = forms;
+		this.lemmas = lemmas;
+		this.cpostags = cpostags;
+		this.postags = postags;
+		this.deprels = deprels;
 		this.features = features;
 		this.weightVector = weightVector;
 	}
 
-	public int addWord(String word) {
-		return words.addEntry(word);
+	public int addForm(String word) {
+		return forms.addEntry(word);
 	}
 
-	public int getNWords() {
-		return words.getSize();
+	public int getNForms() {
+		return forms.getSize();
 	}
 
-	public int getCodeForWord(String word) {
-		return words.getIndex(word);
+	public int getCodeForForm(String word) {
+		return forms.getIndex(word);
 	}
 
-	public String getWordForCode(int code) {
-		return words.getEntry(code);
+	public String getFormForCode(int code) {
+		return forms.getEntry(code);
 	}
 
-	public int addTag(String tag) {
-		return tags.addEntry(tag);
+	public int addLemma(String lemma) {
+		return lemmas.addEntry(lemma);
 	}
 
-	public int getNTags() {
-		return tags.getSize();
+	public int getNLemmas() {
+		return lemmas.getSize();
 	}
 
-	public int getCodeForTag(String tag) {
-		return tags.getIndex(tag);
+	public int getCodeForLemma(String lemma) {
+		return lemmas.getIndex(lemma);
 	}
 
-	public String getTagForCode(int code) {
-		return tags.getEntry(code);
+	public String getLemmaForCode(int code) {
+		return lemmas.getEntry(code);
 	}
 
-	public int addLabel(String label) {
-		return labels.addEntry(label);
+	public int addCPOSTag(String tag) {
+		return cpostags.addEntry(tag);
 	}
 
-	public int getNLabels() {
-		return labels.getSize();
+	public int getNCPOSTags() {
+		return cpostags.getSize();
 	}
 
-	public int getCodeForLabel(String label) {
-		return labels.getIndex(label);
+	public int getCodeForCPOSTag(String cpostag) {
+		return cpostags.getIndex(cpostag);
 	}
 
-	public int getCodeForDefaultLabel() {
-		return labels.getIndex(UNKNOWN_LABEL);
+	public String getCPOSTagForCode(int code) {
+		return cpostags.getEntry(code);
 	}
 
-	public String getLabelForCode(int code) {
-		return labels.getEntry(code);
+	public int addPOSTag(String tag) {
+		return postags.addEntry(tag);
 	}
 
-	public String getDefaultLabel() {
+	public int getNPOSTags() {
+		return postags.getSize();
+	}
+
+	public int getCodeForPOSTag(String postag) {
+		return postags.getIndex(postag);
+	}
+
+	public String getPOSTagForCode(int code) {
+		return postags.getEntry(code);
+	}
+
+	public int addDeprel(String deprel) {
+		return deprels.addEntry(deprel);
+	}
+
+	public int getNDeprels() {
+		return deprels.getSize();
+	}
+
+	public int getCodeForDeprel(String label) {
+		return deprels.getIndex(label);
+	}
+
+	public int getCodeForDefaultDeprel() {
+		return deprels.getIndex(UNKNOWN_LABEL);
+	}
+
+	public String getDeprelForCode(int code) {
+		return deprels.getEntry(code);
+	}
+
+	public String getDefaultDeprel() {
 		return UNKNOWN_LABEL;
 	}
 
@@ -133,9 +173,11 @@ public class Model {
 	}
 
 	public void save(BufferedWriter bw) throws IOException {
-		saveTable(words, bw);
-		saveTable(tags, bw);
-		saveTable(labels, bw);
+		saveTable(forms, bw);
+		saveTable(lemmas, bw);
+		saveTable(cpostags, bw);
+		saveTable(postags, bw);
+		saveTable(deprels, bw);
 		features.save(bw);
 		saveWeightVector(bw);
 	}
@@ -172,12 +214,14 @@ public class Model {
 	}
 
 	public static Model load(BufferedReader br) throws IOException {
-		Table<String> words = loadTable(br);
-		Table<String> tags = loadTable(br);
-		Table<String> labels = loadTable(br);
+		Table<String> forms = loadTable(br);
+		Table<String> lemmas = loadTable(br);
+		Table<String> cpostags = loadTable(br);
+		Table<String> postags = loadTable(br);
+		Table<String> deprels = loadTable(br);
 		FeatureTrie features = FeatureTrie.load(br);
 		double[] weightVector = loadWeightVector(br);
-		return new Model(words, tags, labels, features, weightVector);
+		return new Model(forms, lemmas, cpostags, postags, deprels, features, weightVector);
 	}
 
 	private static Table<String> loadTable(BufferedReader br) throws IOException {

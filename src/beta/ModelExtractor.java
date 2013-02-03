@@ -41,10 +41,12 @@ public class ModelExtractor {
 
 	public CoNLLTree next(CoNLLTree tree) {
 		for (int i = 0; i < tree.getNNodes(); i++) {
-			model.addWord(tree.forms[i]);
-			model.addTag(tree.postags[i]);
+			model.addForm(tree.forms[i]);
+			model.addLemma(tree.lemmas[i]);
+			model.addCPOSTag(tree.cpostags[i]);
+			model.addPOSTag(tree.postags[i]);
 			if (i > 0) {
-				model.addLabel(tree.deprels[i]);
+				model.addDeprel(tree.deprels[i]);
 			}
 		}
 		nTrees++;
@@ -52,7 +54,7 @@ public class ModelExtractor {
 
 		EdgeFeaturizer featurizer = new EdgeFeaturizer(model, tree);
 		for (int i = 1; i < tree.getNNodes(); i++) {
-			int label = model.getCodeForLabel(tree.deprels[i]);
+			int label = model.getCodeForDeprel(tree.deprels[i]);
 			featurizer.featurize(tree.heads[i], i, label, modelUpdater);
 		}
 

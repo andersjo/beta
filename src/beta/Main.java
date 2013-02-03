@@ -86,9 +86,9 @@ public class Main {
 		Model model = modelExtractor.getModel();
 
 		int nTrees = modelExtractor.getNTrees();
-		int nWords = model.getNWords();
-		int nTags = model.getNTags();
-		int nLabels = model.getNLabels();
+		int nWords = model.getNForms();
+		int nTags = model.getNPOSTags();
+		int nLabels = model.getNDeprels();
 		int nFeatures = model.getNFeatures();
 		System.err.format("Found %d trees, %d word forms, %d tags, and %d edge labels.%n", nTrees, nWords, nTags, nLabels);
 		System.err.format("Extracted %d features.%n", nFeatures);
