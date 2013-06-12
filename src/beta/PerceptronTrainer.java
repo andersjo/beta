@@ -19,8 +19,10 @@ public class PerceptronTrainer implements Trainer {
 
 	public PerceptronTrainer(Model model, Parser parser) {
 		this.model = model;
+		int nFeatures = model.getNFeatures();
+		model.setWeightVector(new double[nFeatures]);
 		this.parser = parser;
-		this.acc = new double[model.getWeightVector().length];
+		this.acc = new double[nFeatures];
 	}
 
 	@Override
