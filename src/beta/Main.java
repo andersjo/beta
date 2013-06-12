@@ -93,19 +93,20 @@ public class Main {
 		System.err.format("Found %d trees, %d word forms, %d tags, and %d edge labels.%n", nTrees, nWords, nTags, nLabels);
 		System.err.format("Extracted %d features.%n", nFeatures);
 
-		System.err.println("Training ...");
-
-		long trainingStarted = System.currentTimeMillis();
+		System.err.format("Training (method: %s) ...%n", options.trainingTechnique);
 
 		Parser parser = new Parser(model);
 
 		Trainer trainerHandler = null;
-		if (options.trainingTechnique.equals("PERCEPTRON")) {
+		if (options.trainingTechnique.equals("PC")) {
 			trainerHandler = new PerceptronTrainer(model, parser);
 		}
 		if (options.trainingTechnique.equals("PA")) {
-			trainerHandler = new PassiveAggressiveTrainer(model, new Parser(model));
+			trainerHandler = new PassiveAggressiveTrainer(model, parser);
 		}
+
+		long trainingStarted = System.currentTimeMillis();
+
 		for (int i = 0; i < options.nIterations; i++) {
 			System.err.format("Iteration %d of %d.%n", i + 1, options.nIterations);
 
@@ -167,8 +168,8 @@ public class Main {
 		public int nIterations = 1;
 		@Option(name = "-s", usage = "Save intermediate models")
 		public boolean saveIntermediateModels = false;
-		@Option(name = "-t", argument = "PERCEPTRON|PA", usage = "Train using perceptron (default) or passive-aggressive updates")
-		public String trainingTechnique;
+		@Option(name = "-t", argument = "PC|PA", usage = "Train using the specified training technique")
+		public String trainingTechnique = "PC";
 	}
 
 	public static void parse(String[] args) {
