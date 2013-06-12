@@ -63,7 +63,27 @@ public class OptionParser<E> {
 								}
 							}
 							if (field.getType() == String.class) {
-								field.set(options, arg);
+								String[] tokens = name.argument().split("\\|");
+								if (tokens.length == 1) {
+									field.set(options, arg);
+								} else {
+									boolean ok = false;
+									for (int j = 0; j < tokens.length; j++) {
+										if (arg.equals(tokens[j])) {
+											ok = true;
+											break;
+										}
+									}
+									if (!ok) {
+										StringBuilder sb = new StringBuilder();
+										sb.append(tokens[0]);
+										for (int j = 1; j < tokens.length; j++) {
+											sb.append(", ");
+											sb.append(tokens[j]);
+										}
+										throw new OptionException(String.format("option %s must take one of the following values: %s", name, sb.toString()));
+									}
+								}
 							}
 							i++;
 						}

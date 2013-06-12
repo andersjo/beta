@@ -97,7 +97,15 @@ public class Main {
 
 		long trainingStarted = System.currentTimeMillis();
 
-		TrainerHandler trainerHandler = new TrainerHandler(model, new Parser(model));
+		Parser parser = new Parser(model);
+
+		Trainer trainerHandler = null;
+		if (options.trainingTechnique.equals("PERCEPTRON")) {
+			trainerHandler = new PerceptronTrainer(model, parser);
+		}
+		if (options.trainingTechnique.equals("PA")) {
+			trainerHandler = new PassiveAggressiveTrainer(model, new Parser(model));
+		}
 		for (int i = 0; i < options.nIterations; i++) {
 			System.err.format("Iteration %d of %d.%n", i + 1, options.nIterations);
 
@@ -159,6 +167,8 @@ public class Main {
 		public int nIterations = 1;
 		@Option(name = "-s", usage = "Save intermediate models")
 		public boolean saveIntermediateModels = false;
+		@Option(name = "-t", argument = "PERCEPTRON|PA", usage = "Train using perceptron (default) or passive-aggressive updates")
+		public String trainingTechnique;
 	}
 
 	public static void parse(String[] args) {
