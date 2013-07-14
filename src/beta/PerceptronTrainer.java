@@ -40,12 +40,13 @@ public class PerceptronTrainer implements Trainer {
 		CoNLLTree bestParse = parser.getBestParse(input);
 		FeatureVector best = EdgeFeaturizer.getFeatureVector(bestParse, model);
 
-		FeatureVector delta = FeatureVector.getDelta(gold, best);
-
 		nUpdates++;
 
-		delta.update(1, model.getWeightVector());
-		delta.update(nUpdates, acc);
+		gold.addTo(model.getWeightVector());
+		best.subtractFrom(model.getWeightVector());
+
+		gold.addTo(nUpdates, acc);
+		best.subtractFrom(nUpdates, acc);
 	}
 
 	@Override

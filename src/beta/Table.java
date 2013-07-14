@@ -6,6 +6,9 @@ package beta;
 import gnu.trove.impl.Constants;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +20,7 @@ import java.util.List;
  *
  * @author Marco Kuhlmann <marco.kuhlmann@lingfil.uu.se>
  */
-public class Table<E> {
+public class Table<E> implements Serializable {
 
 	/**
 	 * The index that is used for non-elements.
@@ -30,14 +33,18 @@ public class Table<E> {
 	/**
 	 * The mapping from indexes to entries.
 	 */
-	private final TObjectIntMap<E> table;
+	private transient TObjectIntMap<E> table;
 
 	/**
 	 * Creates a new table.
 	 */
 	public Table() {
 		this.entries = new ArrayList<E>();
-		this.table = new TObjectIntHashMap<E>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, NO_ENTRY_VALUE);
+		this.table = makeTable();
+	}
+
+	private static <E> TObjectIntHashMap<E> makeTable() {
+		return new TObjectIntHashMap<E>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, NO_ENTRY_VALUE);
 	}
 
 	/**
@@ -99,5 +106,15 @@ public class Table<E> {
 	 */
 	public E getEntry(int index) throws IndexOutOfBoundsException {
 		return entries.get(index);
+	}
+
+	private synchronized void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+		ois.defaultReadObject();
+		this.table = makeTable();
+		int index = 0;
+		for (E entry : entries) {
+			table.put(entry, index);
+			index++;
+		}
 	}
 }

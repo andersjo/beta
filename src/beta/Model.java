@@ -4,12 +4,14 @@
 package beta;
 
 import java.io.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  *
  * @author Marco Kuhlmann <marco.kuhlmann@lingfil.uu.se>
  */
-public class Model {
+public class Model implements Serializable {
 
 	public static final String UNKNOWN_LABEL = "ROOT";
 	private final Table<String> forms;
@@ -163,85 +165,22 @@ public class Model {
 	}
 
 	public void save(String fileName) throws IOException {
-		save(new File(fileName));
-	}
-
-	public void save(File file) throws IOException {
-		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-		save(bw);
-		bw.close();
-	}
-
-	public void save(BufferedWriter bw) throws IOException {
-		saveTable(forms, bw);
-		saveTable(lemmas, bw);
-		saveTable(cpostags, bw);
-		saveTable(postags, bw);
-		saveTable(deprels, bw);
-		features.save(bw);
-		saveWeightVector(bw);
-	}
-
-	private static void saveTable(Table<String> table, BufferedWriter bw) throws IOException {
-		bw.write(Integer.toString(table.getSize()));
-		bw.newLine();
-		for (String entry : table.getEntries()) {
-			bw.write(entry);
-			bw.newLine();
-		}
-	}
-
-	private void saveWeightVector(BufferedWriter bw) throws IOException {
-		bw.write(Integer.toString(weightVector.length));
-		bw.newLine();
-		for (int i = 0; i < weightVector.length; i++) {
-			bw.write(Integer.toString(i));
-			bw.write(":");
-			bw.write(Double.toString(weightVector[i]));
-			bw.newLine();
-		}
+		OutputStream os = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(fileName)));
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+		oos.writeObject(this);
+		os.close();
 	}
 
 	public static Model load(String fileName) throws IOException {
-		return load(new File(fileName));
-	}
-
-	public static Model load(File file) throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader(file));
-		Model model = load(br);
-		br.close();
+		InputStream is = new BufferedInputStream(new GZIPInputStream(new FileInputStream(fileName)));
+		ObjectInputStream ois = new ObjectInputStream(is);
+		Model model = null;
+		try {
+			model = (Model) ois.readObject();
+		} catch (ClassNotFoundException e) {
+			throw new IOException(e);
+		}
+		is.close();
 		return model;
-	}
-
-	public static Model load(BufferedReader br) throws IOException {
-		Table<String> forms = loadTable(br);
-		Table<String> lemmas = loadTable(br);
-		Table<String> cpostags = loadTable(br);
-		Table<String> postags = loadTable(br);
-		Table<String> deprels = loadTable(br);
-		FeatureTrie features = FeatureTrie.load(br);
-		double[] weightVector = loadWeightVector(br);
-		return new Model(forms, lemmas, cpostags, postags, deprels, features, weightVector);
-	}
-
-	private static Table<String> loadTable(BufferedReader br) throws IOException {
-		Table<String> table = new Table<String>();
-		int nEntries = Integer.parseInt(br.readLine());
-		for (int i = 0; i < nEntries; i++) {
-			table.addEntry(br.readLine());
-		}
-		return table;
-	}
-
-	public static double[] loadWeightVector(BufferedReader br) throws IOException {
-		int nEntries = Integer.parseInt(br.readLine());
-		double[] weightVector = new double[nEntries];
-		for (int i = 0; i < nEntries; i++) {
-			String[] tokens = br.readLine().split(":");
-			int index = Integer.parseInt(tokens[0]);
-			double value = Double.parseDouble(tokens[1]);
-			weightVector[index] = value;
-		}
-		return weightVector;
 	}
 }

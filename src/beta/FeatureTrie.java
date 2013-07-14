@@ -3,36 +3,45 @@
  */
 package beta;
 
+import gnu.trove.iterator.TIntObjectIterator;
+import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Deque;
+import java.util.LinkedList;
 
 /**
  *
- * @author Marco Kuhlmann <marco.kuhlmann@lingfil.uu.se>
+ * @author Marco Kuhlmann <marco.kuhlmann@liu.se>
  */
-public class FeatureTrie {
+public class FeatureTrie implements Serializable {
 
-	private static final TIntObjectHashMap<FeatureNode> NULL_MAP = new TIntObjectHashMap<FeatureNode>();
 	private static final int NO_ELEMENT = -1;
-	private final FeatureNode[] roots;
-	private final FeatureNode sentinel;
-	private int nEntries;
-	private FeatureNode last;
+	private transient FeatureNode[] roots;
+	private transient int nEntries;
 
 	public FeatureTrie(int size) {
-		this.roots = new FeatureNode[size];
+		this.roots = makeRoots(size);
+	}
+
+	private static FeatureNode[] makeRoots(int size) {
+		FeatureNode[] tmp = new FeatureNode[size];
 		for (int i = 0; i < size; i++) {
-			roots[i] = new FeatureNode(null, i);
+			tmp[i] = new FeatureNode();
 		}
-		this.sentinel = new FeatureNode(null, 0);
-		this.last = sentinel;
+		return tmp;
 	}
 
 	public int getNEntries() {
 		return nEntries;
 	}
 
-	public int add(int[] key) {
+	public int add(int... key) {
+		assert key.length > 0;
+		assert 0 <= key[0] && key[0] < roots.length;
 		FeatureNode node = roots[key[0]];
 		for (int i = 1; i < key.length; i++) {
 			FeatureNode child = node.getChild(key[i]);
@@ -44,14 +53,14 @@ public class FeatureTrie {
 		}
 		if (node.index == NO_ELEMENT) {
 			node.index = nEntries;
-			last.next = node;
-			last = node;
 			nEntries++;
 		}
 		return node.index;
 	}
 
-	public int get(int[] key) {
+	public int get(int... key) {
+		assert key.length > 0;
+		assert 0 <= key[0] && key[0] < roots.length;
 		FeatureNode node = roots[key[0]];
 		for (int i = 1; i < key.length; i++) {
 			FeatureNode child = node.getChild(key[i]);
@@ -64,26 +73,57 @@ public class FeatureTrie {
 		return node.index;
 	}
 
+	/**
+	 * Returns the entries of this trie in the order in which they were added.
+	 *
+	 * @return the entries of this trie in the order in which they were added
+	 */
+	private int[][] getEntries() {
+		int[][] codes = new int[nEntries][];
+
+		Deque<TIntObjectIterator<FeatureNode>> agenda = new LinkedList<TIntObjectIterator<FeatureNode>>();
+
+		TIntObjectMap<FeatureNode> rootMap = new TIntObjectHashMap<FeatureNode>();
+		for (int i = 0; i < roots.length; i++) {
+			rootMap.put(i, roots[i]);
+		}
+		agenda.addLast(rootMap.iterator());
+
+		while (!agenda.isEmpty()) {
+			TIntObjectIterator<FeatureNode> iterator = agenda.getLast();
+			if (!iterator.hasNext()) {
+				agenda.removeLast();
+			} else {
+				iterator.advance();
+				FeatureNode node = iterator.value();
+				if (node.index != NO_ELEMENT) {
+					int[] code = new int[agenda.size()];
+					int i = 0;
+					for (TIntObjectIterator<FeatureNode> it : agenda) {
+						code[i] = it.key();
+						i++;
+					}
+					codes[node.index] = code;
+				}
+				agenda.addLast(node.children.iterator());
+			}
+		}
+
+		return codes;
+	}
+
 	private static class FeatureNode {
 
-		private final FeatureNode parent;
-		private final int childIndex;
 		private TIntObjectHashMap<FeatureNode> children;
 		public int index;
-		public FeatureNode next;
 
-		public FeatureNode(FeatureNode parent, int childIndex) {
-			this.parent = parent;
-			this.childIndex = childIndex;
-			this.children = NULL_MAP;
+		public FeatureNode() {
+			this.children = new TIntObjectHashMap<FeatureNode>();
 			this.index = NO_ELEMENT;
 		}
 
 		public FeatureNode addChild(int childIndex) {
-			if (children == NULL_MAP) {
-				children = new TIntObjectHashMap<FeatureNode>();
-			}
-			FeatureNode child = new FeatureNode(this, childIndex);
+			FeatureNode child = new FeatureNode();
 			children.put(childIndex, child);
 			return child;
 		}
@@ -91,63 +131,21 @@ public class FeatureTrie {
 		public FeatureNode getChild(int key) {
 			return children.get(key);
 		}
+	}
 
-		@Override
-		public String toString() {
-			if (parent == null) {
-				return Integer.toString(childIndex);
-			} else {
-				return parent.toString() + " " + Integer.toString(childIndex);
-			}
+	private synchronized void writeObject(ObjectOutputStream oos) throws IOException {
+		oos.writeInt(roots.length);
+		oos.writeInt(nEntries);
+		for (int[] feature : getEntries()) {
+			oos.writeObject(feature);
 		}
 	}
 
-	public void save(String fileName) throws IOException {
-		save(new File(fileName));
-	}
-
-	public void save(File file) throws IOException {
-		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-		save(bw);
-		bw.close();
-	}
-
-	public void save(BufferedWriter bw) throws IOException {
-		bw.write(Integer.toString(roots.length));
-		bw.newLine();
-		bw.write(Integer.toString(nEntries));
-		bw.newLine();
-		FeatureNode current = sentinel.next;
-		while (current != null) {
-			bw.write(current.toString());
-			bw.newLine();
-			current = current.next;
+	private synchronized void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+		this.roots = makeRoots(ois.readInt());
+		int nEntriesToRead = ois.readInt();
+		for (int i = 0; i < nEntriesToRead; i++) {
+			add((int[]) ois.readObject());
 		}
-	}
-
-	public static FeatureTrie load(String fileName) throws IOException {
-		return load(new File(fileName));
-	}
-
-	public static FeatureTrie load(File file) throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader(file));
-		FeatureTrie featureTrie = load(br);
-		br.close();
-		return featureTrie;
-	}
-
-	public static FeatureTrie load(BufferedReader br) throws IOException {
-		int size = Integer.parseInt(br.readLine());
-		FeatureTrie featureTrie = new FeatureTrie(size);
-		int nEntries = Integer.parseInt(br.readLine());
-		for (int i = 0; i < nEntries; i++) {
-			String tokens[] = br.readLine().split(" ");
-			int[] key = new int[tokens.length];
-			for (int j = 0; j < tokens.length; j++) {
-				key[j] = Integer.parseInt(tokens[j]);
-			}
-			featureTrie.add(key);
-		}
-		return featureTrie;
 	}
 }
