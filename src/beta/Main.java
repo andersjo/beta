@@ -97,7 +97,7 @@ public class Main {
 
 		Parser parser = new Parser(model);
 		
-		Trainer trainerHandler = new PerceptronTrainer(model, parser);
+		Trainer trainerHandler = new Trainer(model, parser);
 
 		long trainingStarted = System.currentTimeMillis();
 
