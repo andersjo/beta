@@ -14,6 +14,7 @@ public class EdgeFeaturizer {
 	private static final int BEG = -1;
 	private static final int END = -2;
 	private static final int MID = -3;
+	private static final int[] LIMITS = new int[]{1, 2, 3, 4, 5, 6, 11};
 	private final int[] form;
 	private final int[] postag;
 	private final int[] pred_postag;
@@ -97,31 +98,20 @@ public class EdgeFeaturizer {
 	}
 
 	public void featurizeCore(int fst, int snd, boolean isRA, FeatureHandler h) {
-		int att = isRA ? 0 : 10;
+		int suffix = makePair(isRA, quantize(snd - fst, LIMITS));
 
-		int dist = snd - fst;
-		if (dist > 10) {
-			dist = 6;
-		} else if (dist > 5) {
-			dist = 5;
-		} else {
-			dist = dist - 1;
-		}
-
-		int attDist = att + dist;
-
-		featurize1(0, postag, pred_postag, succ_postag, fst, snd, isRA, attDist, h);
-		featurize2(13, form, postag, fst, snd, isRA, attDist, h);
+		featurize1(0, postag, pred_postag, succ_postag, fst, snd, isRA, suffix, h);
+		featurize2(13, form, postag, fst, snd, isRA, suffix, h);
 
 		if (useExtendedFeatures) {
-			featurize1(33, cpostag, pred_cpostag, succ_cpostag, fst, snd, isRA, attDist, h);
-			featurize2(46, form, cpostag, fst, snd, isRA, attDist, h);
-			featurize2(59, lemma, postag, fst, snd, isRA, attDist, h);
-			featurize2(72, lemma, cpostag, fst, snd, isRA, attDist, h);
+			featurize1(33, cpostag, pred_cpostag, succ_cpostag, fst, snd, isRA, suffix, h);
+			featurize2(46, form, cpostag, fst, snd, isRA, suffix, h);
+			featurize2(59, lemma, postag, fst, snd, isRA, suffix, h);
+			featurize2(72, lemma, cpostag, fst, snd, isRA, suffix, h);
 		}
 	}
 
-	private void featurize1(int offset, int[] x, int[] pred_x, int[] succ_x, int fst, int snd, boolean isRA, int attDist, FeatureHandler h) {
+	private void featurize1(int offset, int[] x, int[] pred_x, int[] succ_x, int fst, int snd, boolean isRA, int suffix, FeatureHandler h) {
 		int fst_x = x[fst];
 		int snd_x = x[snd];
 
@@ -133,47 +123,47 @@ public class EdgeFeaturizer {
 		for (int mid = fst + 1; mid < snd; mid++) {
 			int mid_t = x[mid];
 			h.handle(offset + 0, fst_x, snd_x, mid_t);
-			h.handle(offset + 0, fst_x, snd_x, mid_t, attDist);
+			h.handle(offset + 0, fst_x, snd_x, mid_t, suffix);
 		}
 
 		h.handle(offset + 1, fst_pred_x, fst_x, snd_x);
-		h.handle(offset + 1, fst_pred_x, fst_x, snd_x, attDist);
+		h.handle(offset + 1, fst_pred_x, fst_x, snd_x, suffix);
 
 		h.handle(offset + 2, fst_pred_x, fst_x, snd_x, snd_succ_x);
-		h.handle(offset + 2, fst_pred_x, fst_x, snd_x, snd_succ_x, attDist);
+		h.handle(offset + 2, fst_pred_x, fst_x, snd_x, snd_succ_x, suffix);
 
 		h.handle(offset + 3, fst_pred_x, snd_x, snd_succ_x);
-		h.handle(offset + 3, fst_pred_x, snd_x, snd_succ_x, attDist);
+		h.handle(offset + 3, fst_pred_x, snd_x, snd_succ_x, suffix);
 
 		h.handle(offset + 4, fst_pred_x, fst_x, snd_succ_x);
-		h.handle(offset + 4, fst_pred_x, fst_x, snd_succ_x, attDist);
+		h.handle(offset + 4, fst_pred_x, fst_x, snd_succ_x, suffix);
 
 		h.handle(offset + 5, fst_x, snd_x, snd_succ_x);
-		h.handle(offset + 5, fst_x, snd_x, snd_succ_x, attDist);
+		h.handle(offset + 5, fst_x, snd_x, snd_succ_x, suffix);
 
 		h.handle(offset + 6, fst_x, fst_succ_x, snd_pred_x);
-		h.handle(offset + 6, fst_x, fst_succ_x, snd_pred_x, attDist);
+		h.handle(offset + 6, fst_x, fst_succ_x, snd_pred_x, suffix);
 
 		h.handle(offset + 7, fst_x, fst_succ_x, snd_pred_x, snd_x);
-		h.handle(offset + 7, fst_x, fst_succ_x, snd_pred_x, snd_x, attDist);
+		h.handle(offset + 7, fst_x, fst_succ_x, snd_pred_x, snd_x, suffix);
 
 		h.handle(offset + 8, fst_x, fst_succ_x, snd_x);
-		h.handle(offset + 8, fst_x, fst_succ_x, snd_x, attDist);
+		h.handle(offset + 8, fst_x, fst_succ_x, snd_x, suffix);
 
 		h.handle(offset + 9, fst_x, snd_pred_x, snd_x);
-		h.handle(offset + 9, fst_x, snd_pred_x, snd_x, attDist);
+		h.handle(offset + 9, fst_x, snd_pred_x, snd_x, suffix);
 
 		h.handle(offset + 10, fst_succ_x, snd_pred_x, snd_x);
-		h.handle(offset + 10, fst_succ_x, snd_pred_x, snd_x, attDist);
+		h.handle(offset + 10, fst_succ_x, snd_pred_x, snd_x, suffix);
 
 		h.handle(offset + 11, fst_pred_x, fst_x, snd_pred_x, snd_x);
-		h.handle(offset + 11, fst_pred_x, fst_x, snd_pred_x, snd_x, attDist);
+		h.handle(offset + 11, fst_pred_x, fst_x, snd_pred_x, snd_x, suffix);
 
 		h.handle(offset + 12, fst_x, fst_succ_x, snd_x, snd_succ_x);
-		h.handle(offset + 12, fst_x, fst_succ_x, snd_x, snd_succ_x, attDist);
+		h.handle(offset + 12, fst_x, fst_succ_x, snd_x, snd_succ_x, suffix);
 	}
 
-	private void featurize2(int offset, int[] a, int[] b, int fst, int snd, boolean isRA, int attDist, FeatureHandler h) {
+	private void featurize2(int offset, int[] a, int[] b, int fst, int snd, boolean isRA, int suffix, FeatureHandler h) {
 		int src = isRA ? fst : snd;
 		int tgt = isRA ? snd : fst;
 
@@ -183,47 +173,47 @@ public class EdgeFeaturizer {
 		int tgt_b = b[tgt];
 
 		h.handle(offset + 0, src_a);
-		h.handle(offset + 0, src_a, attDist);
+		h.handle(offset + 0, src_a, suffix);
 
 		h.handle(offset + 1, src_a, src_b);
-		h.handle(offset + 1, src_a, src_b, attDist);
+		h.handle(offset + 1, src_a, src_b, suffix);
 
 		h.handle(offset + 2, src_a, src_b, tgt_b);
-		h.handle(offset + 2, src_a, src_b, tgt_b, attDist);
+		h.handle(offset + 2, src_a, src_b, tgt_b, suffix);
 
 		h.handle(offset + 3, src_a, src_b, tgt_b, tgt_a);
-		h.handle(offset + 3, src_a, src_b, tgt_b, tgt_a, attDist);
+		h.handle(offset + 3, src_a, src_b, tgt_b, tgt_a, suffix);
 
 		h.handle(offset + 4, src_a, tgt_a);
-		h.handle(offset + 4, src_a, tgt_a, attDist);
+		h.handle(offset + 4, src_a, tgt_a, suffix);
 
 		h.handle(offset + 5, src_a, tgt_b);
-		h.handle(offset + 5, src_a, tgt_b, attDist);
+		h.handle(offset + 5, src_a, tgt_b, suffix);
 
 		h.handle(offset + 6, src_b, tgt_a);
-		h.handle(offset + 6, src_b, tgt_a, attDist);
+		h.handle(offset + 6, src_b, tgt_a, suffix);
 
 		h.handle(offset + 7, src_b, tgt_a, tgt_b);
-		h.handle(offset + 7, src_b, tgt_a, tgt_b, attDist);
+		h.handle(offset + 7, src_b, tgt_a, tgt_b, suffix);
 
 		h.handle(offset + 8, src_b, tgt_b);
-		h.handle(offset + 8, src_b, tgt_b, attDist);
+		h.handle(offset + 8, src_b, tgt_b, suffix);
 
 		h.handle(offset + 9, tgt_a, tgt_b);
-		h.handle(offset + 9, tgt_a, tgt_b, attDist);
+		h.handle(offset + 9, tgt_a, tgt_b, suffix);
 
 		h.handle(offset + 10, src_b);
-		h.handle(offset + 10, src_b, attDist);
+		h.handle(offset + 10, src_b, suffix);
 
 		h.handle(offset + 11, tgt_a);
-		h.handle(offset + 11, tgt_a, attDist);
+		h.handle(offset + 11, tgt_a, suffix);
 
 		h.handle(offset + 12, tgt_b);
-		h.handle(offset + 12, tgt_b, attDist);
+		h.handle(offset + 12, tgt_b, suffix);
 	}
 
 	public void featurizeLabeled(int node, int label, boolean isRA, boolean isTarget, FeatureHandler h) {
-		int suffix = (isRA ? 0 : 10) + (isTarget ? 0 : 1);
+		int suffix = makePair(isRA, isTarget);
 
 		int node_w = form[node];
 		int node_t = postag[node];
@@ -269,5 +259,37 @@ public class EdgeFeaturizer {
 				featureVector.increment(index);
 			}
 		}
+	}
+
+	/**
+	 * Quantize an integer value relative to a partition of intervals. This
+	 * returns the unique index {@code i} such that {@code value} is contained
+	 * in the interval that starts at {@code limits[i]}, or -1 if value is
+	 * smaller than {@code limits[0]}.
+	 *
+	 * @param value the value to be quantized
+	 * @param limits the left endpoints of the intervals
+	 * @return the index of the interval to which the specified value belongs
+	 */
+	private static int quantize(int value, int[] limits) {
+		if (limits.length == 0 || value < limits[0]) {
+			return -1;
+		} else {
+			for (int i = 1; i < limits.length; i++) {
+				if (value < limits[i]) {
+					return i - 1;
+				}
+			}
+			return limits.length - 1;
+		}
+	}
+
+	private static int makePair(boolean b, int i) {
+		assert i >= 0;
+		return b ? i : -1 - i;
+	}
+
+	private static int makePair(boolean b1, boolean b2) {
+		return makePair(b1, b2 ? 1 : 0);
 	}
 }
