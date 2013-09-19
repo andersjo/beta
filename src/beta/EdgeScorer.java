@@ -152,7 +152,7 @@ public class EdgeScorer {
 	 * @param tgt the target node of the arc
 	 * @return the highest possible score for the specified arc
 	 */
-	public double getScoreForBestLabel(int src, int tgt) {
+	public double getBestScore(int src, int tgt) {
 		assert src != tgt;
 		return scores[src][tgt][bestLabels[src][tgt]];
 	}
