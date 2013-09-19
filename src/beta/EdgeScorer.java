@@ -5,7 +5,6 @@ package beta;
 
 import beta.conll.CoNLLTree;
 
-
 /**
  * Score an edge in a dependency graph.
  *
@@ -17,11 +16,11 @@ import beta.conll.CoNLLTree;
 public class EdgeScorer {
 
 	/**
-	 * The scores for all labeled arcs.
+	 * The highest possible scores for all arcs.
 	 */
-	private final double[][][] scores;
+	private final double[][] bestScores;
 	/**
-	 * The best labels for all (source, target) pairs.
+	 * The highest-scoring labels for all arcs.
 	 */
 	private final int[][] bestLabels;
 
@@ -89,29 +88,26 @@ public class EdgeScorer {
 
 		// Step 3: Compute the full scores and the labels that yield them.
 
-		this.scores = new double[nNodes][nNodes][nLabels];
+		this.bestScores = new double[nNodes][nNodes];
 		this.bestLabels = new int[nNodes][nNodes];
 
 		for (int fst = 0; fst < nNodes; fst++) {
 			for (int snd = fst + 1; snd < nNodes; snd++) {
-				bestLabels[fst][snd] = model.getCodeForDefaultDeprel();
-				bestLabels[snd][fst] = model.getCodeForDefaultDeprel();
-
-				double bestScoreRA = Double.NEGATIVE_INFINITY;
-				double bestScoreLA = Double.NEGATIVE_INFINITY;
+				bestScores[fst][snd] = Double.NEGATIVE_INFINITY;
+				bestScores[snd][fst] = Double.NEGATIVE_INFINITY;
 
 				for (int lab = 0; lab < nLabels; lab++) {
 					// Edge from fst to snd (RA).
-					scores[fst][snd][lab] = scoresCore[fst][snd] + scoresLabeled[fst][lab][0][1] + scoresLabeled[snd][lab][0][0];
-					if (scores[fst][snd][lab] > bestScoreRA) {
-						bestScoreRA = scores[fst][snd][lab];
+					double scoreRA = scoresCore[fst][snd] + scoresLabeled[fst][lab][0][1] + scoresLabeled[snd][lab][0][0];
+					if (scoreRA > bestScores[fst][snd]) {
+						bestScores[fst][snd] = scoreRA;
 						bestLabels[fst][snd] = lab;
 					}
 
 					// Edge from snd to fst (LA).
-					scores[snd][fst][lab] = scoresCore[snd][fst] + scoresLabeled[snd][lab][1][1] + scoresLabeled[fst][lab][1][0];
-					if (scores[snd][fst][lab] > bestScoreLA) {
-						bestScoreLA = scores[snd][fst][lab];
+					double scoreLA = scoresCore[snd][fst] + scoresLabeled[snd][lab][1][1] + scoresLabeled[fst][lab][1][0];
+					if (scoreLA > bestScores[snd][fst]) {
+						bestScores[snd][fst] = scoreLA;
 						bestLabels[snd][fst] = lab;
 					}
 				}
@@ -120,16 +116,15 @@ public class EdgeScorer {
 	}
 
 	/**
-	 * Returns the score for the specified arc.
+	 * Returns the highest possible score for the specified arc.
 	 *
 	 * @param src the source node of the arc
 	 * @param tgt the target node of the arc
-	 * @param label the label of the arc
-	 * @return the score for the specified arc
+	 * @return the highest possible score for the specified arc
 	 */
-	public double getScore(int src, int tgt, int label) {
+	public double getBestScore(int src, int tgt) {
 		assert src != tgt;
-		return scores[src][tgt][label];
+		return bestScores[src][tgt];
 	}
 
 	/**
@@ -143,18 +138,6 @@ public class EdgeScorer {
 	public int getBestLabel(int src, int tgt) {
 		assert src != tgt;
 		return bestLabels[src][tgt];
-	}
-
-	/**
-	 * Returns the highest possible score for the specified arc.
-	 *
-	 * @param src the source node of the arc
-	 * @param tgt the target node of the arc
-	 * @return the highest possible score for the specified arc
-	 */
-	public double getBestScore(int src, int tgt) {
-		assert src != tgt;
-		return scores[src][tgt][bestLabels[src][tgt]];
 	}
 
 	/**
