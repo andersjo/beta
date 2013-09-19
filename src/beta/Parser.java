@@ -20,6 +20,8 @@ public class Parser {
 	public CoNLLTree getBestParse(CoNLLTree input) {
 		int nNodes = input.getNNodes();
 
+		// Initialize the charts.
+
 		ChoiceChart chart1 = new ChoiceChart(nNodes);
 		ChoiceChart chart2 = new ChoiceChart(nNodes);
 		ChoiceChart chart3 = new ChoiceChart(nNodes);
@@ -32,106 +34,84 @@ public class Parser {
 
 		EdgeScorer scorer = new EdgeScorer(model, input);
 
-		int nLabels = model.getNDeprels();
-
-		for (int h = 0; h < nNodes; h++) {
-			score1.set(h, h, 0.0);
-			score2.set(h, h, 0.0);
-		}
+		// Fill the charts bottom-up, starting with spans of length 2. Note
+		// that at this point, every span of length 1 has score 0.0.
 
 		for (int max = 1; max < nNodes; max++) {
 			for (int min = max - 1; min >= 0; min--) {
-				int labMinMax = scorer.getBestLabel(min, max);
-				double scoreMinMax = scorer.getScoreForBestLabel(min, max);
-				int labMaxMin = scorer.getBestLabel(max, min);
-				double scoreMaxMin = scorer.getScoreForBestLabel(max, min);
+				score1.set(min, max, Double.NEGATIVE_INFINITY);
+				score2.set(min, max, Double.NEGATIVE_INFINITY);
+				score3.set(min, max, Double.NEGATIVE_INFINITY);
+				score4.set(min, max, Double.NEGATIVE_INFINITY);
+
+				double bestScoreMinMax = scorer.getBestScore(min, max);
+				int bestLabelMinMax = scorer.getBestLabel(min, max);
 
 				// Attach-Right
 				// creates an edge min -> max
-				double bestScore1 = Double.NEGATIVE_INFINITY;
-				int bestMid1 = -1;
 				for (int mid = min + 1; mid <= max; mid++) {
 					double scoreL = score1.get(min, mid - 1);
 					double scoreR = score2.get(mid, max);
 
-					double score = scoreL + scoreR + scoreMinMax;
+					double score = scoreL + scoreR + bestScoreMinMax;
 
-					if (score > bestScore1) {
-						bestScore1 = score;
-						bestMid1 = mid;
+					if (score > score3.get(min, max)) {
+						score3.set(min, max, score);
+						Choice choiceL = chart1.get(min, mid - 1);
+						Choice choiceR = chart2.get(mid, max);
+						chart3.set(min, max, new Choice(min, max, bestLabelMinMax, choiceL, choiceR));
 					}
 				}
-				if (bestMid1 >= 0) {
-					score3.set(min, max, bestScore1);
-					Choice choiceL = chart1.get(min, bestMid1 - 1);
-					Choice choiceR = chart2.get(bestMid1, max);
-					chart3.set(min, max, new Choice(min, max, labMinMax, choiceL, choiceR));
-				}
+
+				double bestScoreMaxMin = scorer.getBestScore(max, min);
+				int bestLabelMaxMin = scorer.getBestLabel(max, min);
 
 				// Attach-Left
 				// creates an edge max -> min
-				double bestScore2 = Double.NEGATIVE_INFINITY;
-				int bestMid2 = -1;
-				for (int mid = min; mid < max; mid++) {
-					double scoreL = score1.get(min, mid);
-					double scoreR = score2.get(mid + 1, max);
+				for (int mid = min + 1; mid <= max; mid++) {
+					double scoreL = score1.get(min, mid - 1);
+					double scoreR = score2.get(mid, max);
 
-					double score = scoreL + scoreR + scoreMaxMin;
+					double score = scoreL + scoreR + bestScoreMaxMin;
 
-					if (score > bestScore2) {
-						bestScore2 = score;
-						bestMid2 = mid;
+					if (score > score4.get(min, max)) {
+						score4.set(min, max, score);
+						Choice choiceL = chart1.get(min, mid - 1);
+						Choice choiceR = chart2.get(mid, max);
+						chart4.set(min, max, new Choice(max, min, bestLabelMaxMin, choiceL, choiceR));
 					}
-				}
-				if (bestMid2 >= 0) {
-					score4.set(min, max, bestScore2);
-					Choice choiceL = chart1.get(min, bestMid2);
-					Choice choiceR = chart2.get(bestMid2 + 1, max);
-					chart4.set(min, max, new Choice(max, min, labMaxMin, choiceL, choiceR));
 				}
 
 				// Complete-Right
 				// creates no edge
-				double bestScore3 = Double.NEGATIVE_INFINITY;
-				int bestMid3 = -1;
 				for (int mid = min + 1; mid <= max; mid++) {
 					double scoreL = score3.get(min, mid);
 					double scoreR = score1.get(mid, max);
 
 					double score = scoreL + scoreR;
 
-					if (score > bestScore3) {
-						bestScore3 = score;
-						bestMid3 = mid;
+					if (score > score1.get(min, max)) {
+						score1.set(min, max, score);
+						Choice choiceL = chart3.get(min, mid);
+						Choice choiceR = chart1.get(mid, max);
+						chart1.set(min, max, new Choice(choiceL, choiceR));
 					}
-				}
-				if (bestMid3 >= 0) {
-					score1.set(min, max, bestScore3);
-					Choice choiceL = chart3.get(min, bestMid3);
-					Choice choiceR = chart1.get(bestMid3, max);
-					chart1.set(min, max, new Choice(choiceL, choiceR));
 				}
 
 				// Complete-Left
 				// creates no edge
-				double bestScore4 = Double.NEGATIVE_INFINITY;
-				int bestMid4 = -1;
 				for (int mid = min; mid < max; mid++) {
 					double scoreL = score2.get(min, mid);
 					double scoreR = score4.get(mid, max);
 
 					double score = scoreL + scoreR;
 
-					if (score > bestScore4) {
-						bestScore4 = score;
-						bestMid4 = mid;
+					if (score > score2.get(min, max)) {
+						score2.set(min, max, score);
+						Choice choiceL = chart2.get(min, mid);
+						Choice choiceR = chart4.get(mid, max);
+						chart2.set(min, max, new Choice(choiceL, choiceR));
 					}
-				}
-				if (bestMid4 >= 0) {
-					score2.set(min, max, bestScore4);
-					Choice choiceL = chart2.get(min, bestMid4);
-					Choice choiceR = chart4.get(bestMid4, max);
-					chart2.set(min, max, new Choice(choiceL, choiceR));
 				}
 			}
 		}
@@ -151,9 +131,6 @@ public class Parser {
 			this.chart = new double[nNodes][];
 			for (int i = 0; i < nNodes; i++) {
 				chart[i] = new double[nNodes - i];
-				for (int j = 0; j < chart[i].length; j++) {
-					chart[i][j] = Double.NEGATIVE_INFINITY;
-				}
 			}
 		}
 
