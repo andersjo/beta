@@ -29,9 +29,9 @@ public class FeatureVector {
 	}
 
 	public void addTo(double alpha, double[] parameters) {
-		TIntIterator itPos = features.iterator();
-		while (itPos.hasNext()) {
-			parameters[itPos.next()] += alpha;
+		TIntIterator it = features.iterator();
+		while (it.hasNext()) {
+			parameters[it.next()] += alpha;
 		}
 	}
 
@@ -40,17 +40,17 @@ public class FeatureVector {
 	}
 
 	public void subtractFrom(double alpha, double[] parameters) {
-		TIntIterator itPos = features.iterator();
-		while (itPos.hasNext()) {
-			parameters[itPos.next()] -= alpha;
+		TIntIterator it = features.iterator();
+		while (it.hasNext()) {
+			parameters[it.next()] -= alpha;
 		}
 	}
 
 	public double getScore(double[] parameters) {
 		double score = 0.0;
-		TIntIterator itPos = features.iterator();
-		while (itPos.hasNext()) {
-			score += parameters[itPos.next()];
+		TIntIterator it = features.iterator();
+		while (it.hasNext()) {
+			score += parameters[it.next()];
 		}
 		return score;
 	}
