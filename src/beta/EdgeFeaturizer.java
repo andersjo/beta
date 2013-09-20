@@ -57,12 +57,6 @@ public class EdgeFeaturizer {
 		featurizeLabeled(src, label, isRA, false, h);
 	}
 
-	public FeatureVector getFeatureVector(Model model, int src, int tgt, int label) {
-		FeatureVector featureVector = new FeatureVector();
-		featurize(src, tgt, label, new FeatureVectorUpdater(model, featureVector));
-		return featureVector;
-	}
-
 	public static FeatureVector getFeatureVector(CoNLLTree graph, Model model) {
 		FeatureVector featureVector = new FeatureVector();
 		EdgeFeaturizer featurizer = new EdgeFeaturizer(model, graph);
