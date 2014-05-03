@@ -1,7 +1,7 @@
 /*
  * See the file "LICENSE" for the full license governing this code.
  */
-package beta.conll;
+package se.liu.ida.nlp.beta.conll;
 
 import java.io.BufferedWriter;
 import java.io.File;

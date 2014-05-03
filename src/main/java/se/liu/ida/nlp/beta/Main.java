@@ -1,18 +1,18 @@
 /*
  * See the file "LICENSE" for the full license governing this code.
  */
-package beta;
+package se.liu.ida.nlp.beta;
 
-import beta.conll.CoNLLReader;
-import beta.conll.CoNLLTree;
-import beta.conll.CoNLLWriter;
-import beta.options.Option;
-import beta.options.OptionException;
-import beta.options.OptionParser;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import se.liu.ida.nlp.beta.conll.CoNLLReader;
+import se.liu.ida.nlp.beta.conll.CoNLLTree;
+import se.liu.ida.nlp.beta.conll.CoNLLWriter;
+import se.liu.ida.nlp.beta.options.Option;
+import se.liu.ida.nlp.beta.options.OptionException;
+import se.liu.ida.nlp.beta.options.OptionParser;
 
 /**
  * Command-line interface.

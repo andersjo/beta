@@ -1,7 +1,7 @@
 /*
  * See the file "LICENSE" for the full license governing this code.
  */
-package beta.options;
+package se.liu.ida.nlp.beta.options;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;

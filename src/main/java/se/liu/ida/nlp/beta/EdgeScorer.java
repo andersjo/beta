@@ -1,9 +1,9 @@
 /*
  * See the file "LICENSE" for the full license governing this code.
  */
-package beta;
+package se.liu.ida.nlp.beta;
 
-import beta.conll.CoNLLTree;
+import se.liu.ida.nlp.beta.conll.CoNLLTree;
 
 /**
  * Score an edge in a dependency graph.

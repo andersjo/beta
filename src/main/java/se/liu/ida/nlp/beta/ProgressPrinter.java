@@ -1,7 +1,7 @@
 /*
  * See the file "LICENSE" for the full license governing this code.
  */
-package beta;
+package se.liu.ida.nlp.beta;
 
 /**
  *
