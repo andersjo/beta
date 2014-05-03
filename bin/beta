@@ -2,4 +2,4 @@
 
 set -e
 
-java -Xmx2G -jar $(dirname $0)/../dist/beta.jar $@
+java -Xmx2G -cp $(dirname $0)/../build/libs/beta.jar: se.liu.ida.nlp.beta.Main $@
