@@ -96,9 +96,9 @@ $ perl bin/eval07.pl -s out.conll -g data/talbanken-dep-test.conll -q
 You should see the following output:
 
 ```
-  Labeled   attachment score: 15385 / 20376 * 100 = 75.51 %
-  Unlabeled attachment score: 17070 / 20376 * 100 = 83.78 %
-  Label accuracy score:       16420 / 20376 * 100 = 80.59 %
+  Labeled   attachment score: 15238 / 20376 * 100 = 74.78 %
+  Unlabeled attachment score: 16963 / 20376 * 100 = 83.25 %
+  Label accuracy score:       16347 / 20376 * 100 = 80.23 %
 ```
 
 ## Optimization
@@ -113,8 +113,6 @@ The number of iterations over the training data is specified using the ``-n`` fl
 $ bin/beta train -i data/talbanken-dep-train.conll -m MODEL -n 9
 ```
 
-(For the sample data, this happens to improve labeled accuracy from 75.51% to 79.03%.)
-
 When trying to find the best value for ``-n``, you may find it convenient to train with a large number of iterations (say 10) and save the intermediate models after each iteration so that afterwards you can pick the best one. To do this, you can specify the ``-s`` option. For example, the following command will train using 10 iterations, and will save the intermediate models as ``MODEL.01``, ``MODEL.02``, and so on:
 
 ```
@@ -123,7 +121,7 @@ $ bin/beta train -i data/talbanken-dep-train.conll -m MODEL -n 10 -s
 
 ## License
 
-Copyright (c) 2013 Marco Kuhlmann
+Copyright (c) 2013, 2014 Marco Kuhlmann
 
 Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
 
