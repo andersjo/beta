@@ -2,7 +2,7 @@
 
 Beta is a simple first-order dependency parser. It is a (partial) reimplementation of the excellent [MSTParser](http://sourceforge.net/projects/mstparser/), with a focus on simplicity, teachability, and speed.
 
-Beta was written by [Marco Kuhlmann](http://stp.lingfil.uu.se/~kuhlmann/).
+Beta was written by [Marco Kuhlmann](http://www.ida.liu.se/~marku61/).
 
 Note that you should most probably *not* use Beta if you want a parser with optimal accuracy. There are many other systems out there that serve this purpose. I especially recommend [MaltParser](http://www.maltparser.org/), which also features a comprehensive documentation. The short user guide that follows was heavily inspired by that documentation.
 
@@ -10,18 +10,24 @@ Note that you should most probably *not* use Beta if you want a parser with opti
 
 This section describes the basic usage of Beta.
 
-### Downloading and installing Beta
+### Cloning Beta
 
-Binary releases of Beta are available via the [Downloads section](https://bitbucket.org/kuhlmann/beta/downloads) of the project site. Once you have downloaded a release, unpack it at a location of your choice:
-
-```
-$ tar xzf beta-VERSION.tar.gz
-```
-
-This will create a new directory ``beta-VERSION``. Enter that directory:
+To start using Beta, clone it at a location of your choice:
 
 ```
-$ cd beta-VERSION
+$ git clone https://github.com/liu-nlp/beta.git
+```
+
+This will create a new directory ``beta``. Enter that directory:
+
+```
+$ cd beta
+```
+
+Beta is built using [Gradle](http://www.gradle.org).
+
+```
+$ gradle jar
 ```
 
 You should now be able to run Beta by typing the command
@@ -30,7 +36,7 @@ You should now be able to run Beta by typing the command
 $ bin/beta
 ```
 
-This command is actually a shell script that calls Java. Therefore, the command only works if your system both supports shell scripts, and has Java properly installed.
+This command is actually a shell script that calls Java. Therefore, the command will only work if your system both supports shell scripts, and has Java properly installed.
 
 ### Training a parsing model
 
@@ -121,8 +127,4 @@ $ bin/beta train -i data/talbanken-dep-train.conll -m MODEL -n 10 -s
 
 ## License
 
-Copyright (c) 2013, 2014 Marco Kuhlmann
-
-Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons Lizenzvertrag" style="border-width:0" src="http://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" property="dct:title" rel="dct:type">Beta</span> von <a xmlns:cc="http://creativecommons.org/ns#" href="http://github.com/liu-nlp/beta" property="cc:attributionName" rel="cc:attributionURL">Marco Kuhlmann</a> ist lizenziert unter einer <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Namensnennung 4.0 International Lizenz</a>.
