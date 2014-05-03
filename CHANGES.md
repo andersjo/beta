@@ -1,5 +1,11 @@
 # Changes
 
+## Version 1.2 (2014-05-03)
+
+* The project is now hosted at GitHub.
+* Switched to Gradle as the new build manager.
+* Code synchronization with other LiU-NLP projects.
+
 ## Version 1.1 (2013-02-02)
 
 * Speed improvements. The ``FeatureTrie`` class was rewritten such that feature access is now even faster than before.
