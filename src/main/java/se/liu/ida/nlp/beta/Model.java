@@ -32,11 +32,11 @@ public class Model implements Serializable {
 	private double[] weightVector;
 
 	public Model() {
-		this.forms = new Table<String>();
-		this.lemmas = new Table<String>();
-		this.cpostags = new Table<String>();
-		this.postags = new Table<String>();
-		this.deprels = new Table<String>();
+		this.forms = new Table<>();
+		this.lemmas = new Table<>();
+		this.cpostags = new Table<>();
+		this.postags = new Table<>();
+		this.deprels = new Table<>();
 		this.features = new FeatureTrie(85);
 		this.weightVector = null;
 	}
@@ -174,22 +174,23 @@ public class Model implements Serializable {
 	}
 
 	public void save(String fileName) throws IOException {
-		OutputStream os = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(fileName)));
-		ObjectOutputStream oos = new ObjectOutputStream(os);
-		oos.writeObject(this);
-		os.close();
+		try (OutputStream os = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(fileName)))) {
+			ObjectOutputStream oos = new ObjectOutputStream(os);
+			oos.writeObject(this);
+		}
 	}
 
 	public static Model load(String fileName) throws IOException {
-		InputStream is = new BufferedInputStream(new GZIPInputStream(new FileInputStream(fileName)));
-		ObjectInputStream ois = new ObjectInputStream(is);
-		Model model = null;
-		try {
-			model = (Model) ois.readObject();
-		} catch (ClassNotFoundException e) {
-			throw new IOException(e);
+		Model model;
+		try (InputStream is = new BufferedInputStream(new GZIPInputStream(new FileInputStream(fileName)))) {
+			ObjectInputStream ois = new ObjectInputStream(is);
+			model = null;
+			try {
+				model = (Model) ois.readObject();
+			} catch (ClassNotFoundException e) {
+				throw new IOException(e);
+			}
 		}
-		is.close();
 		return model;
 	}
 }

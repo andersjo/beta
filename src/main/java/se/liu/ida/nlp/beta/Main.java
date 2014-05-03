@@ -55,7 +55,7 @@ public class Main {
 
 	public static void train(String[] args) {
 		TrainOptions options = new TrainOptions();
-		OptionParser<TrainOptions> optionParser = new OptionParser<TrainOptions>(options);
+		OptionParser<TrainOptions> optionParser = new OptionParser<>(options);
 		try {
 			optionParser.parse(args);
 		} catch (OptionException e) {
@@ -166,7 +166,7 @@ public class Main {
 
 	public static void parse(String[] args) {
 		ParseOptions options = new ParseOptions();
-		OptionParser<ParseOptions> optionParser = new OptionParser<ParseOptions>(options);
+		OptionParser<ParseOptions> optionParser = new OptionParser<>(options);
 		try {
 			optionParser.parse(args);
 		} catch (OptionException e) {

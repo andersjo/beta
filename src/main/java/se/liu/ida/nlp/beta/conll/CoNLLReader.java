@@ -90,7 +90,7 @@ public class CoNLLReader {
 		if (line == null || line.isEmpty()) {
 			return null;
 		} else {
-			List<String> lines = new LinkedList<String>();
+			List<String> lines = new LinkedList<>();
 			do {
 				lines.add(line);
 			} while ((line = reader.readLine()) != null && !line.isEmpty());

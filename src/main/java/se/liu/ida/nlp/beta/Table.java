@@ -39,12 +39,12 @@ public class Table<E> implements Serializable {
 	 * Creates a new table.
 	 */
 	public Table() {
-		this.entries = new ArrayList<E>();
+		this.entries = new ArrayList<>();
 		this.table = makeTable();
 	}
 
 	private static <E> TObjectIntHashMap<E> makeTable() {
-		return new TObjectIntHashMap<E>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, NO_ENTRY_VALUE);
+		return new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, NO_ENTRY_VALUE);
 	}
 
 	/**

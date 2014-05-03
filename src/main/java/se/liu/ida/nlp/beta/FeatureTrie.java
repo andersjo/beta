@@ -81,9 +81,9 @@ public class FeatureTrie implements Serializable {
 	private int[][] getEntries() {
 		int[][] codes = new int[nEntries][];
 
-		Deque<TIntObjectIterator<FeatureNode>> agenda = new LinkedList<TIntObjectIterator<FeatureNode>>();
+		Deque<TIntObjectIterator<FeatureNode>> agenda = new LinkedList<>();
 
-		TIntObjectMap<FeatureNode> rootMap = new TIntObjectHashMap<FeatureNode>();
+		TIntObjectMap<FeatureNode> rootMap = new TIntObjectHashMap<>();
 		for (int i = 0; i < roots.length; i++) {
 			rootMap.put(i, roots[i]);
 		}
@@ -118,7 +118,7 @@ public class FeatureTrie implements Serializable {
 		public int index;
 
 		public FeatureNode() {
-			this.children = new TIntObjectHashMap<FeatureNode>();
+			this.children = new TIntObjectHashMap<>();
 			this.index = NO_ELEMENT;
 		}
 

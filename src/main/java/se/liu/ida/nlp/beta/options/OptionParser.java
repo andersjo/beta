@@ -22,9 +22,9 @@ public class OptionParser<E> {
 
 	public OptionParser(E options) {
 		this.options = options;
-		this.nameToOption = new HashMap<String, Option>();
-		this.nameToField = new HashMap<String, Field>();
-		this.required = new HashSet<String>();
+		this.nameToOption = new HashMap<>();
+		this.nameToField = new HashMap<>();
+		this.required = new HashSet<>();
 		for (Field field : options.getClass().getDeclaredFields()) {
 			Option option = field.getAnnotation(Option.class);
 			if (option != null) {
@@ -39,7 +39,7 @@ public class OptionParser<E> {
 	}
 
 	public E parse(String[] args) throws OptionException {
-		Set<String> todo = new HashSet<String>(required);
+		Set<String> todo = new HashSet<>(required);
 		for (int i = 0; i < args.length; i++) {
 			Option name = nameToOption.get(args[i]);
 			if (name == null) {
@@ -68,8 +68,8 @@ public class OptionParser<E> {
 									field.set(options, arg);
 								} else {
 									boolean ok = false;
-									for (int j = 0; j < tokens.length; j++) {
-										if (arg.equals(tokens[j])) {
+									for (String token : tokens) {
+										if (arg.equals(token)) {
 											ok = true;
 											break;
 										}
