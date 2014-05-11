@@ -9,5 +9,5 @@ package se.liu.ida.nlp.beta;
  */
 public interface FeatureHandler {
 
-	abstract public void handle(int... feature);
+	abstract public void handle(long feature);
 }

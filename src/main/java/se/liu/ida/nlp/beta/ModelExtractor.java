@@ -69,7 +69,7 @@ public class ModelExtractor {
 		}
 
 		@Override
-		public void handle(int[] feature) {
+		public void handle(long feature) {
 			model.addFeature(feature);
 		}
 	}

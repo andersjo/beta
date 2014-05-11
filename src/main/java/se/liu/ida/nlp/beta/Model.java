@@ -3,6 +3,9 @@
  */
 package se.liu.ida.nlp.beta;
 
+import gnu.trove.impl.Constants;
+import gnu.trove.map.TLongIntMap;
+import gnu.trove.map.hash.TLongIntHashMap;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -22,13 +25,14 @@ import java.util.zip.GZIPOutputStream;
  */
 public class Model implements Serializable {
 
+	private static final int NO_ENTRY = -1;
 	public static final String UNKNOWN_LABEL = "ROOT";
 	private final Table<String> forms;
 	private final Table<String> lemmas;
 	private final Table<String> cpostags;
 	private final Table<String> postags;
 	private final Table<String> deprels;
-	private final FeatureTrie features;
+	private final TLongIntMap features;
 	private double[] weightVector;
 
 	public Model() {
@@ -37,7 +41,7 @@ public class Model implements Serializable {
 		this.cpostags = new Table<>();
 		this.postags = new Table<>();
 		this.deprels = new Table<>();
-		this.features = new FeatureTrie(85);
+		this.features = new TLongIntHashMap(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, 0, NO_ENTRY);
 		this.weightVector = null;
 	}
 
@@ -51,7 +55,7 @@ public class Model implements Serializable {
 		this.weightVector = new double[model.getNFeatures()];
 	}
 
-	private Model(Table<String> forms, Table<String> lemmas, Table<String> cpostags, Table<String> postags, Table<String> deprels, FeatureTrie features, double[] weightVector) {
+	private Model(Table<String> forms, Table<String> lemmas, Table<String> cpostags, Table<String> postags, Table<String> deprels, TLongIntMap features, double[] weightVector) {
 		this.forms = forms;
 		this.lemmas = lemmas;
 		this.cpostags = cpostags;
@@ -149,15 +153,20 @@ public class Model implements Serializable {
 		return UNKNOWN_LABEL;
 	}
 
-	public int addFeature(int[] feature) {
-		return features.add(feature);
+	public int addFeature(long feature) {
+		int code = features.get(feature);
+		if (code == NO_ENTRY) {
+			code = features.size();
+			features.put(feature, code);
+		}
+		return code;
 	}
 
 	public int getNFeatures() {
-		return features.getNEntries();
+		return features.size();
 	}
 
-	public int getCodeForFeature(int[] feature) {
+	public int getCodeForFeature(long feature) {
 		return features.get(feature);
 	}
 

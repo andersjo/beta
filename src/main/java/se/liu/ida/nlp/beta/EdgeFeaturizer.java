@@ -11,16 +11,41 @@ import se.liu.ida.nlp.beta.conll.CoNLLTree;
  */
 public class EdgeFeaturizer {
 
-	private static final int BEG = -1;
-	private static final int END = -2;
-	private static final int MID = -3;
 	private static final int[] LIMITS = new int[]{1, 2, 3, 4, 5, 6, 11};
+	private final int T_OFF;
+	private final int W_OFF;
+	private final int L_OFF;
+	private final int BEG_T;
+	private final int END_T;
+	private final int MID_T;
 	private final int[] w;
 	private final int[] t;
 	private final int[] pred_t;
 	private final int[] succ_t;
 
+	private static int getNBits(long x) {
+		int nBits = 1;
+		long max = 1;
+		while (max < x) {
+			max = max << 1;
+			nBits++;
+		}
+		return nBits;
+	}
+
 	public EdgeFeaturizer(Model model, CoNLLTree tree) {
+		int nForms = model.getNForms();
+		this.W_OFF = getNBits(nForms);
+
+		int nTags = model.getNPOSTags();
+		this.BEG_T = nTags + 0;
+		this.END_T = nTags + 1;
+		this.MID_T = nTags + 2;
+		nTags += 3;
+		this.T_OFF = getNBits(nTags);
+
+		this.L_OFF = getNBits(model.getNDeprels());
+
 		int nNodes = tree.getNNodes();
 
 		this.w = new int[nNodes];
@@ -33,14 +58,14 @@ public class EdgeFeaturizer {
 
 		this.pred_t = new int[nNodes];
 
-		pred_t[0] = BEG;
+		pred_t[0] = BEG_T;
 		for (int i = 1; i < nNodes; i++) {
 			pred_t[i] = t[i - 1];
 		}
 
 		this.succ_t = new int[nNodes];
 
-		succ_t[nNodes - 1] = END;
+		succ_t[nNodes - 1] = END_T;
 		for (int i = nNodes - 2; i >= 0; i--) {
 			succ_t[i] = t[i + 1];
 		}
@@ -67,6 +92,64 @@ public class EdgeFeaturizer {
 		}
 		return featureVector;
 	}
+	private static final int TMP_OFF = getNBits(33);
+	private static final int TMP_00 = 0;
+	private static final int TMP_01 = 1;
+	private static final int TMP_02 = 2;
+	private static final int TMP_03 = 3;
+	private static final int TMP_04 = 4;
+	private static final int TMP_05 = 5;
+	private static final int TMP_06 = 6;
+	private static final int TMP_07 = 7;
+	private static final int TMP_08 = 8;
+	private static final int TMP_09 = 9;
+	private static final int TMP_10 = 10;
+	private static final int TMP_11 = 11;
+	private static final int TMP_12 = 12;
+	private static final int TMP_13 = 13;
+	private static final int TMP_14 = 14;
+	private static final int TMP_15 = 15;
+	private static final int TMP_16 = 16;
+	private static final int TMP_17 = 17;
+	private static final int TMP_18 = 18;
+	private static final int TMP_19 = 19;
+	private static final int TMP_20 = 20;
+	private static final int TMP_21 = 21;
+	private static final int TMP_22 = 22;
+	private static final int TMP_23 = 23;
+	private static final int TMP_24 = 24;
+	private static final int TMP_25 = 25;
+	private static final int TMP_26 = 26;
+	private static final int TMP_27 = 27;
+	private static final int TMP_28 = 28;
+	private static final int TMP_29 = 29;
+	private static final int TMP_30 = 30;
+	private static final int TMP_31 = 31;
+	private static final int TMP_32 = 32;
+
+	private static long encode(long x1) {
+		return x1;
+	}
+
+	private static long encode(long x1, int o1, long x2) {
+		return x2 << o1 | x1;
+	}
+
+	private static long encode(long x1, int o1, long x2, int o2, long x3) {
+		return (x3 << o2 | x2) << o1 | x1;
+	}
+
+	private static long encode(long x1, int o1, long x2, int o2, long x3, int o3, long x4) {
+		return ((x4 << o3 | x3) << o2 | x2) << o1 | x1;
+	}
+
+	private static long encode(long x1, int o1, long x2, int o2, long x3, int o3, long x4, int o4, long x5) {
+		return (((x5 << o4 | x4) << o3 | x3) << o2 | x2) << o1 | x1;
+	}
+
+	private static long encode(long x1, int o1, long x2, int o2, long x3, int o3, long x4, int o4, long x5, int o5, long x6) {
+		return ((((x6 << o5 | x5) << o4 | x4) << o3 | x3) << o2 | x2) << o1 | x1;
+	}
 
 	public void featurizeCore(int fst, int snd, boolean isRA, FeatureHandler h) {
 		int attDist = makePair(isRA, quantize(snd - fst, LIMITS));
@@ -76,50 +159,50 @@ public class EdgeFeaturizer {
 
 		int fst_pred_t = pred_t[fst];
 		int snd_succ_t = succ_t[snd];
-		int fst_succ_t = fst < snd - 1 ? succ_t[fst] : MID;
-		int snd_pred_t = snd > fst + 1 ? pred_t[snd] : MID;
+		int fst_succ_t = fst < snd - 1 ? succ_t[fst] : MID_T;
+		int snd_pred_t = snd > fst + 1 ? pred_t[snd] : MID_T;
 
 		for (int mid = fst + 1; mid < snd; mid++) {
 			int mid_t = t[mid];
-			h.handle(0, fst_t, snd_t, mid_t);
-			h.handle(0, fst_t, snd_t, mid_t, attDist);
+			h.handle(encode(TMP_00, TMP_OFF, fst_t, T_OFF, snd_t, T_OFF, mid_t));
+			h.handle(encode(TMP_00, TMP_OFF, fst_t, T_OFF, snd_t, T_OFF, mid_t, T_OFF, attDist));
 		}
 
-		h.handle(1, fst_pred_t, fst_t, snd_t);
-		h.handle(1, fst_pred_t, fst_t, snd_t, attDist);
+		h.handle(encode(TMP_01, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_t));
+		h.handle(encode(TMP_01, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_t, T_OFF, attDist));
 
-		h.handle(2, fst_pred_t, fst_t, snd_t, snd_succ_t);
-		h.handle(2, fst_pred_t, fst_t, snd_t, snd_succ_t, attDist);
+		h.handle(encode(TMP_02, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_t, T_OFF, snd_succ_t));
+		h.handle(encode(TMP_02, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_t, T_OFF, snd_succ_t, T_OFF, attDist));
 
-		h.handle(3, fst_pred_t, snd_t, snd_succ_t);
-		h.handle(3, fst_pred_t, snd_t, snd_succ_t, attDist);
+		h.handle(encode(TMP_03, TMP_OFF, fst_pred_t, T_OFF, snd_t, T_OFF, snd_succ_t));
+		h.handle(encode(TMP_03, TMP_OFF, fst_pred_t, T_OFF, snd_t, T_OFF, snd_succ_t, T_OFF, attDist));
 
-		h.handle(4, fst_pred_t, fst_t, snd_succ_t);
-		h.handle(4, fst_pred_t, fst_t, snd_succ_t, attDist);
+		h.handle(encode(TMP_04, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_succ_t));
+		h.handle(encode(TMP_04, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_succ_t, T_OFF, attDist));
 
-		h.handle(5, fst_t, snd_t, snd_succ_t);
-		h.handle(5, fst_t, snd_t, snd_succ_t, attDist);
+		h.handle(encode(TMP_05, TMP_OFF, fst_t, T_OFF, snd_t, T_OFF, snd_succ_t));
+		h.handle(encode(TMP_05, TMP_OFF, fst_t, T_OFF, snd_t, T_OFF, snd_succ_t, T_OFF, attDist));
 
-		h.handle(6, fst_t, fst_succ_t, snd_pred_t);
-		h.handle(6, fst_t, fst_succ_t, snd_pred_t, attDist);
+		h.handle(encode(TMP_06, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_pred_t));
+		h.handle(encode(TMP_06, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, attDist));
 
-		h.handle(7, fst_t, fst_succ_t, snd_pred_t, snd_t);
-		h.handle(7, fst_t, fst_succ_t, snd_pred_t, snd_t, attDist);
+		h.handle(encode(TMP_07, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, snd_t));
+		h.handle(encode(TMP_07, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, snd_t, T_OFF, attDist));
 
-		h.handle(8, fst_t, fst_succ_t, snd_t);
-		h.handle(8, fst_t, fst_succ_t, snd_t, attDist);
+		h.handle(encode(TMP_08, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_t));
+		h.handle(encode(TMP_08, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_t, T_OFF, attDist));
 
-		h.handle(9, fst_t, snd_pred_t, snd_t);
-		h.handle(9, fst_t, snd_pred_t, snd_t, attDist);
+		h.handle(encode(TMP_09, TMP_OFF, fst_t, T_OFF, snd_pred_t, T_OFF, snd_t));
+		h.handle(encode(TMP_09, TMP_OFF, fst_t, T_OFF, snd_pred_t, T_OFF, snd_t, T_OFF, attDist));
 
-		h.handle(10, fst_succ_t, snd_pred_t, snd_t);
-		h.handle(10, fst_succ_t, snd_pred_t, snd_t, attDist);
+		h.handle(encode(TMP_10, TMP_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, snd_t));
+		h.handle(encode(TMP_10, TMP_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, snd_t, T_OFF, attDist));
 
-		h.handle(11, fst_pred_t, fst_t, snd_pred_t, snd_t);
-		h.handle(11, fst_pred_t, fst_t, snd_pred_t, snd_t, attDist);
+		h.handle(encode(TMP_11, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_pred_t, T_OFF, snd_t));
+		h.handle(encode(TMP_11, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_pred_t, T_OFF, snd_t, T_OFF, attDist));
 
-		h.handle(12, fst_t, fst_succ_t, snd_t, snd_succ_t);
-		h.handle(12, fst_t, fst_succ_t, snd_t, snd_succ_t, attDist);
+		h.handle(encode(TMP_12, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_t, T_OFF, snd_succ_t));
+		h.handle(encode(TMP_12, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_t, T_OFF, snd_succ_t, T_OFF, attDist));
 
 		int src = isRA ? fst : snd;
 		int tgt = isRA ? snd : fst;
@@ -129,44 +212,44 @@ public class EdgeFeaturizer {
 		int tgt_w = w[tgt];
 		int tgt_t = t[tgt];
 
-		h.handle(13, src_w);
-		h.handle(13, src_w, attDist);
+		h.handle(encode(TMP_13, TMP_OFF, src_w));
+		h.handle(encode(TMP_13, TMP_OFF, src_w, W_OFF, attDist));
 
-		h.handle(14, src_w, src_t);
-		h.handle(14, src_w, src_t, attDist);
+		h.handle(encode(TMP_14, TMP_OFF, src_w, W_OFF, src_t));
+		h.handle(encode(TMP_14, TMP_OFF, src_w, W_OFF, src_t, T_OFF, attDist));
 
-		h.handle(15, src_w, src_t, tgt_t);
-		h.handle(15, src_w, src_t, tgt_t, attDist);
+		h.handle(encode(TMP_15, TMP_OFF, src_w, W_OFF, src_t, T_OFF, tgt_t));
+		h.handle(encode(TMP_15, TMP_OFF, src_w, W_OFF, src_t, T_OFF, tgt_t, T_OFF, attDist));
 
-		h.handle(16, src_w, src_t, tgt_t, tgt_w);
-		h.handle(16, src_w, src_t, tgt_t, tgt_w, attDist);
+		h.handle(encode(TMP_16, TMP_OFF, src_w, W_OFF, src_t, T_OFF, tgt_t, T_OFF, tgt_w));
+		h.handle(encode(TMP_16, TMP_OFF, src_w, W_OFF, src_t, T_OFF, tgt_t, T_OFF, tgt_w, W_OFF, attDist));
 
-		h.handle(17, src_w, tgt_w);
-		h.handle(17, src_w, tgt_w, attDist);
+		h.handle(encode(TMP_17, TMP_OFF, src_w, W_OFF, tgt_w));
+		h.handle(encode(TMP_17, TMP_OFF, src_w, W_OFF, tgt_w, W_OFF, attDist));
 
-		h.handle(18, src_w, tgt_t);
-		h.handle(18, src_w, tgt_t, attDist);
+		h.handle(encode(TMP_18, TMP_OFF, src_w, W_OFF, tgt_t));
+		h.handle(encode(TMP_18, TMP_OFF, src_w, W_OFF, tgt_t, T_OFF, attDist));
 
-		h.handle(19, src_t, tgt_w);
-		h.handle(19, src_t, tgt_w, attDist);
+		h.handle(encode(TMP_19, TMP_OFF, src_t, T_OFF, tgt_w));
+		h.handle(encode(TMP_19, TMP_OFF, src_t, T_OFF, tgt_w, W_OFF, attDist));
 
-		h.handle(20, src_t, tgt_w, tgt_t);
-		h.handle(20, src_t, tgt_w, tgt_t, attDist);
+		h.handle(encode(TMP_20, TMP_OFF, src_t, T_OFF, tgt_w, W_OFF, tgt_t));
+		h.handle(encode(TMP_20, TMP_OFF, src_t, T_OFF, tgt_w, W_OFF, tgt_t, T_OFF, attDist));
 
-		h.handle(21, src_t, tgt_t);
-		h.handle(21, src_t, tgt_t, attDist);
+		h.handle(encode(TMP_21, TMP_OFF, src_t, T_OFF, tgt_t));
+		h.handle(encode(TMP_21, TMP_OFF, src_t, T_OFF, tgt_t, T_OFF, attDist));
 
-		h.handle(22, tgt_w, tgt_t);
-		h.handle(22, tgt_w, tgt_t, attDist);
+		h.handle(encode(TMP_22, TMP_OFF, tgt_w, W_OFF, tgt_t));
+		h.handle(encode(TMP_22, TMP_OFF, tgt_w, W_OFF, tgt_t, T_OFF, attDist));
 
-		h.handle(23, src_t);
-		h.handle(23, src_t, attDist);
+		h.handle(encode(TMP_23, TMP_OFF, src_t));
+		h.handle(encode(TMP_23, TMP_OFF, src_t, T_OFF, attDist));
 
-		h.handle(24, tgt_w);
-		h.handle(24, tgt_w, attDist);
+		h.handle(encode(TMP_24, TMP_OFF, tgt_w));
+		h.handle(encode(TMP_24, TMP_OFF, tgt_w, W_OFF, attDist));
 
-		h.handle(25, tgt_t);
-		h.handle(25, tgt_t, attDist);
+		h.handle(encode(TMP_25, TMP_OFF, tgt_t));
+		h.handle(encode(TMP_25, TMP_OFF, tgt_t, T_OFF, attDist));
 	}
 
 	public void featurizeLabeled(int node, int label, boolean isRA, boolean isTarget, FeatureHandler h) {
@@ -177,26 +260,26 @@ public class EdgeFeaturizer {
 		int node_pred_t = pred_t[node];
 		int node_succ_t = succ_t[node];
 
-		h.handle(26, label);
-		h.handle(26, label, suffix);
+		h.handle(encode(TMP_26, TMP_OFF, label));
+		h.handle(encode(TMP_26, TMP_OFF, label, L_OFF, suffix));
 
-		h.handle(27, node_w, node_t, label);
-		h.handle(27, node_w, node_t, label, suffix);
+		h.handle(encode(TMP_27, TMP_OFF, node_w, W_OFF, node_t, T_OFF, label));
+		h.handle(encode(TMP_27, TMP_OFF, node_w, W_OFF, node_t, T_OFF, label, L_OFF, suffix));
 
-		h.handle(28, node_t, label);
-		h.handle(28, node_t, label, suffix);
+		h.handle(encode(TMP_28, TMP_OFF, node_t, T_OFF, label));
+		h.handle(encode(TMP_28, TMP_OFF, node_t, T_OFF, label, L_OFF, suffix));
 
-		h.handle(29, node_pred_t, node_t, label);
-		h.handle(29, node_pred_t, node_t, label, suffix);
+		h.handle(encode(TMP_29, TMP_OFF, node_pred_t, T_OFF, node_t, T_OFF, label));
+		h.handle(encode(TMP_29, TMP_OFF, node_pred_t, T_OFF, node_t, T_OFF, label, L_OFF, suffix));
 
-		h.handle(30, node_t, node_succ_t, label);
-		h.handle(30, node_t, node_succ_t, label, suffix);
+		h.handle(encode(TMP_30, TMP_OFF, node_t, T_OFF, node_succ_t, T_OFF, label));
+		h.handle(encode(TMP_30, TMP_OFF, node_t, T_OFF, node_succ_t, T_OFF, label, L_OFF, suffix));
 
-		h.handle(31, node_pred_t, node_t, node_succ_t, label);
-		h.handle(31, node_pred_t, node_t, node_succ_t, label, suffix);
+		h.handle(encode(TMP_31, TMP_OFF, node_pred_t, T_OFF, node_t, T_OFF, node_succ_t, T_OFF, label));
+		h.handle(encode(TMP_31, TMP_OFF, node_pred_t, T_OFF, node_t, T_OFF, node_succ_t, T_OFF, label, L_OFF, suffix));
 
-		h.handle(32, node_w, label);
-		h.handle(32, node_w, label, suffix);
+		h.handle(encode(TMP_32, TMP_OFF, node_w, W_OFF, label));
+		h.handle(encode(TMP_32, TMP_OFF, node_w, W_OFF, label, L_OFF, suffix));
 	}
 
 	private static class FeatureVectorUpdater implements FeatureHandler {
@@ -210,7 +293,7 @@ public class EdgeFeaturizer {
 		}
 
 		@Override
-		public void handle(int[] feature) {
+		public void handle(long feature) {
 			int index = model.getCodeForFeature(feature);
 			if (index >= 0) {
 				featureVector.increment(index);

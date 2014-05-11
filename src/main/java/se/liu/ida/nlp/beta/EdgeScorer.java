@@ -157,7 +157,7 @@ public class EdgeScorer {
 		}
 
 		@Override
-		public void handle(int[] feature) {
+		public void handle(long feature) {
 			int index = model.getCodeForFeature(feature);
 			if (index >= 0) {
 				client.increment(index);
