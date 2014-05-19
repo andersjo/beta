@@ -24,27 +24,24 @@ public class EdgeFeaturizer {
 	private final int[] succ_t;
 
 	private static int getNBits(long x) {
-		int nBits = 1;
-		long max = 1;
-		while (max < x) {
-			max = max << 1;
-			nBits++;
-		}
-		return nBits;
+		return (int) Math.ceil(Math.log(x) / Math.log(2));
 	}
 
 	public EdgeFeaturizer(Model model, CoNLLTree tree) {
 		int nForms = model.getNForms();
+		nForms += 1; // unknown word form
 		this.W_OFF = getNBits(nForms);
 
 		int nTags = model.getNPOSTags();
+		nTags += 1; // unknown word form
 		this.BEG_T = nTags + 0;
 		this.END_T = nTags + 1;
 		this.MID_T = nTags + 2;
 		nTags += 3;
 		this.T_OFF = getNBits(nTags);
 
-		this.L_OFF = getNBits(model.getNDeprels());
+		int nLabels = model.getNDeprels();
+		this.L_OFF = getNBits(nLabels);
 
 		int nNodes = tree.getNNodes();
 
@@ -57,14 +54,12 @@ public class EdgeFeaturizer {
 		}
 
 		this.pred_t = new int[nNodes];
-
 		pred_t[0] = BEG_T;
 		for (int i = 1; i < nNodes; i++) {
 			pred_t[i] = t[i - 1];
 		}
 
 		this.succ_t = new int[nNodes];
-
 		succ_t[nNodes - 1] = END_T;
 		for (int i = nNodes - 2; i >= 0; i--) {
 			succ_t[i] = t[i + 1];
@@ -127,32 +122,8 @@ public class EdgeFeaturizer {
 	private static final int TMP_31 = 31;
 	private static final int TMP_32 = 32;
 
-	private static long encode(long x1) {
-		return x1;
-	}
-
-	private static long encode(long x1, int o1, long x2) {
-		return x2 << o1 | x1;
-	}
-
-	private static long encode(long x1, int o1, long x2, int o2, long x3) {
-		return (x3 << o2 | x2) << o1 | x1;
-	}
-
-	private static long encode(long x1, int o1, long x2, int o2, long x3, int o3, long x4) {
-		return ((x4 << o3 | x3) << o2 | x2) << o1 | x1;
-	}
-
-	private static long encode(long x1, int o1, long x2, int o2, long x3, int o3, long x4, int o4, long x5) {
-		return (((x5 << o4 | x4) << o3 | x3) << o2 | x2) << o1 | x1;
-	}
-
-	private static long encode(long x1, int o1, long x2, int o2, long x3, int o3, long x4, int o4, long x5, int o5, long x6) {
-		return ((((x6 << o5 | x5) << o4 | x4) << o3 | x3) << o2 | x2) << o1 | x1;
-	}
-
 	public void featurizeCore(int fst, int snd, boolean isRA, FeatureHandler h) {
-		int attDist = makePair(isRA, quantize(snd - fst, LIMITS));
+		long attDist = makePair(isRA, quantize(snd - fst, LIMITS));
 
 		int fst_t = t[fst];
 		int snd_t = t[snd];
@@ -164,45 +135,45 @@ public class EdgeFeaturizer {
 
 		for (int mid = fst + 1; mid < snd; mid++) {
 			int mid_t = t[mid];
-			h.handle(encode(TMP_00, TMP_OFF, fst_t, T_OFF, snd_t, T_OFF, mid_t));
-			h.handle(encode(TMP_00, TMP_OFF, fst_t, T_OFF, snd_t, T_OFF, mid_t, T_OFF, attDist));
+			h.handle(TMP_00, TMP_OFF, fst_t, T_OFF, snd_t, T_OFF, mid_t);
+			h.handle(TMP_00, TMP_OFF, fst_t, T_OFF, snd_t, T_OFF, mid_t, T_OFF, attDist);
 		}
 
-		h.handle(encode(TMP_01, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_t));
-		h.handle(encode(TMP_01, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_t, T_OFF, attDist));
+		h.handle(TMP_01, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_t);
+		h.handle(TMP_01, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_02, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_t, T_OFF, snd_succ_t));
-		h.handle(encode(TMP_02, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_t, T_OFF, snd_succ_t, T_OFF, attDist));
+		h.handle(TMP_02, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_t, T_OFF, snd_succ_t);
+		h.handle(TMP_02, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_t, T_OFF, snd_succ_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_03, TMP_OFF, fst_pred_t, T_OFF, snd_t, T_OFF, snd_succ_t));
-		h.handle(encode(TMP_03, TMP_OFF, fst_pred_t, T_OFF, snd_t, T_OFF, snd_succ_t, T_OFF, attDist));
+		h.handle(TMP_03, TMP_OFF, fst_pred_t, T_OFF, snd_t, T_OFF, snd_succ_t);
+		h.handle(TMP_03, TMP_OFF, fst_pred_t, T_OFF, snd_t, T_OFF, snd_succ_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_04, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_succ_t));
-		h.handle(encode(TMP_04, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_succ_t, T_OFF, attDist));
+		h.handle(TMP_04, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_succ_t);
+		h.handle(TMP_04, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_succ_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_05, TMP_OFF, fst_t, T_OFF, snd_t, T_OFF, snd_succ_t));
-		h.handle(encode(TMP_05, TMP_OFF, fst_t, T_OFF, snd_t, T_OFF, snd_succ_t, T_OFF, attDist));
+		h.handle(TMP_05, TMP_OFF, fst_t, T_OFF, snd_t, T_OFF, snd_succ_t);
+		h.handle(TMP_05, TMP_OFF, fst_t, T_OFF, snd_t, T_OFF, snd_succ_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_06, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_pred_t));
-		h.handle(encode(TMP_06, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, attDist));
+		h.handle(TMP_06, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_pred_t);
+		h.handle(TMP_06, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_07, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, snd_t));
-		h.handle(encode(TMP_07, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, snd_t, T_OFF, attDist));
+		h.handle(TMP_07, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, snd_t);
+		h.handle(TMP_07, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, snd_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_08, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_t));
-		h.handle(encode(TMP_08, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_t, T_OFF, attDist));
+		h.handle(TMP_08, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_t);
+		h.handle(TMP_08, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_09, TMP_OFF, fst_t, T_OFF, snd_pred_t, T_OFF, snd_t));
-		h.handle(encode(TMP_09, TMP_OFF, fst_t, T_OFF, snd_pred_t, T_OFF, snd_t, T_OFF, attDist));
+		h.handle(TMP_09, TMP_OFF, fst_t, T_OFF, snd_pred_t, T_OFF, snd_t);
+		h.handle(TMP_09, TMP_OFF, fst_t, T_OFF, snd_pred_t, T_OFF, snd_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_10, TMP_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, snd_t));
-		h.handle(encode(TMP_10, TMP_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, snd_t, T_OFF, attDist));
+		h.handle(TMP_10, TMP_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, snd_t);
+		h.handle(TMP_10, TMP_OFF, fst_succ_t, T_OFF, snd_pred_t, T_OFF, snd_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_11, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_pred_t, T_OFF, snd_t));
-		h.handle(encode(TMP_11, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_pred_t, T_OFF, snd_t, T_OFF, attDist));
+		h.handle(TMP_11, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_pred_t, T_OFF, snd_t);
+		h.handle(TMP_11, TMP_OFF, fst_pred_t, T_OFF, fst_t, T_OFF, snd_pred_t, T_OFF, snd_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_12, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_t, T_OFF, snd_succ_t));
-		h.handle(encode(TMP_12, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_t, T_OFF, snd_succ_t, T_OFF, attDist));
+		h.handle(TMP_12, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_t, T_OFF, snd_succ_t);
+		h.handle(TMP_12, TMP_OFF, fst_t, T_OFF, fst_succ_t, T_OFF, snd_t, T_OFF, snd_succ_t, T_OFF, attDist);
 
 		int src = isRA ? fst : snd;
 		int tgt = isRA ? snd : fst;
@@ -212,74 +183,74 @@ public class EdgeFeaturizer {
 		int tgt_w = w[tgt];
 		int tgt_t = t[tgt];
 
-		h.handle(encode(TMP_13, TMP_OFF, src_w));
-		h.handle(encode(TMP_13, TMP_OFF, src_w, W_OFF, attDist));
+		h.handle(TMP_13, TMP_OFF, src_w);
+		h.handle(TMP_13, TMP_OFF, src_w, W_OFF, attDist);
 
-		h.handle(encode(TMP_14, TMP_OFF, src_w, W_OFF, src_t));
-		h.handle(encode(TMP_14, TMP_OFF, src_w, W_OFF, src_t, T_OFF, attDist));
+		h.handle(TMP_14, TMP_OFF, src_w, W_OFF, src_t);
+		h.handle(TMP_14, TMP_OFF, src_w, W_OFF, src_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_15, TMP_OFF, src_w, W_OFF, src_t, T_OFF, tgt_t));
-		h.handle(encode(TMP_15, TMP_OFF, src_w, W_OFF, src_t, T_OFF, tgt_t, T_OFF, attDist));
+		h.handle(TMP_15, TMP_OFF, src_w, W_OFF, src_t, T_OFF, tgt_t);
+		h.handle(TMP_15, TMP_OFF, src_w, W_OFF, src_t, T_OFF, tgt_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_16, TMP_OFF, src_w, W_OFF, src_t, T_OFF, tgt_t, T_OFF, tgt_w));
-		h.handle(encode(TMP_16, TMP_OFF, src_w, W_OFF, src_t, T_OFF, tgt_t, T_OFF, tgt_w, W_OFF, attDist));
+		h.handle(TMP_16, TMP_OFF, src_w, W_OFF, src_t, T_OFF, tgt_t, T_OFF, tgt_w);
+		h.handle(TMP_16, TMP_OFF, src_w, W_OFF, src_t, T_OFF, tgt_t, T_OFF, tgt_w, W_OFF, attDist);
 
-		h.handle(encode(TMP_17, TMP_OFF, src_w, W_OFF, tgt_w));
-		h.handle(encode(TMP_17, TMP_OFF, src_w, W_OFF, tgt_w, W_OFF, attDist));
+		h.handle(TMP_17, TMP_OFF, src_w, W_OFF, tgt_w);
+		h.handle(TMP_17, TMP_OFF, src_w, W_OFF, tgt_w, W_OFF, attDist);
 
-		h.handle(encode(TMP_18, TMP_OFF, src_w, W_OFF, tgt_t));
-		h.handle(encode(TMP_18, TMP_OFF, src_w, W_OFF, tgt_t, T_OFF, attDist));
+		h.handle(TMP_18, TMP_OFF, src_w, W_OFF, tgt_t);
+		h.handle(TMP_18, TMP_OFF, src_w, W_OFF, tgt_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_19, TMP_OFF, src_t, T_OFF, tgt_w));
-		h.handle(encode(TMP_19, TMP_OFF, src_t, T_OFF, tgt_w, W_OFF, attDist));
+		h.handle(TMP_19, TMP_OFF, src_t, T_OFF, tgt_w);
+		h.handle(TMP_19, TMP_OFF, src_t, T_OFF, tgt_w, W_OFF, attDist);
 
-		h.handle(encode(TMP_20, TMP_OFF, src_t, T_OFF, tgt_w, W_OFF, tgt_t));
-		h.handle(encode(TMP_20, TMP_OFF, src_t, T_OFF, tgt_w, W_OFF, tgt_t, T_OFF, attDist));
+		h.handle(TMP_20, TMP_OFF, src_t, T_OFF, tgt_w, W_OFF, tgt_t);
+		h.handle(TMP_20, TMP_OFF, src_t, T_OFF, tgt_w, W_OFF, tgt_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_21, TMP_OFF, src_t, T_OFF, tgt_t));
-		h.handle(encode(TMP_21, TMP_OFF, src_t, T_OFF, tgt_t, T_OFF, attDist));
+		h.handle(TMP_21, TMP_OFF, src_t, T_OFF, tgt_t);
+		h.handle(TMP_21, TMP_OFF, src_t, T_OFF, tgt_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_22, TMP_OFF, tgt_w, W_OFF, tgt_t));
-		h.handle(encode(TMP_22, TMP_OFF, tgt_w, W_OFF, tgt_t, T_OFF, attDist));
+		h.handle(TMP_22, TMP_OFF, tgt_w, W_OFF, tgt_t);
+		h.handle(TMP_22, TMP_OFF, tgt_w, W_OFF, tgt_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_23, TMP_OFF, src_t));
-		h.handle(encode(TMP_23, TMP_OFF, src_t, T_OFF, attDist));
+		h.handle(TMP_23, TMP_OFF, src_t);
+		h.handle(TMP_23, TMP_OFF, src_t, T_OFF, attDist);
 
-		h.handle(encode(TMP_24, TMP_OFF, tgt_w));
-		h.handle(encode(TMP_24, TMP_OFF, tgt_w, W_OFF, attDist));
+		h.handle(TMP_24, TMP_OFF, tgt_w);
+		h.handle(TMP_24, TMP_OFF, tgt_w, W_OFF, attDist);
 
-		h.handle(encode(TMP_25, TMP_OFF, tgt_t));
-		h.handle(encode(TMP_25, TMP_OFF, tgt_t, T_OFF, attDist));
+		h.handle(TMP_25, TMP_OFF, tgt_t);
+		h.handle(TMP_25, TMP_OFF, tgt_t, T_OFF, attDist);
 	}
 
 	public void featurizeLabeled(int node, int label, boolean isRA, boolean isTarget, FeatureHandler h) {
-		int suffix = makePair(isRA, isTarget);
+		long suffix = makePair(isRA, isTarget);
 
 		int node_w = w[node];
 		int node_t = t[node];
 		int node_pred_t = pred_t[node];
 		int node_succ_t = succ_t[node];
 
-		h.handle(encode(TMP_26, TMP_OFF, label));
-		h.handle(encode(TMP_26, TMP_OFF, label, L_OFF, suffix));
+		h.handle(TMP_26, TMP_OFF, label);
+		h.handle(TMP_26, TMP_OFF, label, L_OFF, suffix);
 
-		h.handle(encode(TMP_27, TMP_OFF, node_w, W_OFF, node_t, T_OFF, label));
-		h.handle(encode(TMP_27, TMP_OFF, node_w, W_OFF, node_t, T_OFF, label, L_OFF, suffix));
+		h.handle(TMP_27, TMP_OFF, node_w, W_OFF, node_t, T_OFF, label);
+		h.handle(TMP_27, TMP_OFF, node_w, W_OFF, node_t, T_OFF, label, L_OFF, suffix);
 
-		h.handle(encode(TMP_28, TMP_OFF, node_t, T_OFF, label));
-		h.handle(encode(TMP_28, TMP_OFF, node_t, T_OFF, label, L_OFF, suffix));
+		h.handle(TMP_28, TMP_OFF, node_t, T_OFF, label);
+		h.handle(TMP_28, TMP_OFF, node_t, T_OFF, label, L_OFF, suffix);
 
-		h.handle(encode(TMP_29, TMP_OFF, node_pred_t, T_OFF, node_t, T_OFF, label));
-		h.handle(encode(TMP_29, TMP_OFF, node_pred_t, T_OFF, node_t, T_OFF, label, L_OFF, suffix));
+		h.handle(TMP_29, TMP_OFF, node_pred_t, T_OFF, node_t, T_OFF, label);
+		h.handle(TMP_29, TMP_OFF, node_pred_t, T_OFF, node_t, T_OFF, label, L_OFF, suffix);
 
-		h.handle(encode(TMP_30, TMP_OFF, node_t, T_OFF, node_succ_t, T_OFF, label));
-		h.handle(encode(TMP_30, TMP_OFF, node_t, T_OFF, node_succ_t, T_OFF, label, L_OFF, suffix));
+		h.handle(TMP_30, TMP_OFF, node_t, T_OFF, node_succ_t, T_OFF, label);
+		h.handle(TMP_30, TMP_OFF, node_t, T_OFF, node_succ_t, T_OFF, label, L_OFF, suffix);
 
-		h.handle(encode(TMP_31, TMP_OFF, node_pred_t, T_OFF, node_t, T_OFF, node_succ_t, T_OFF, label));
-		h.handle(encode(TMP_31, TMP_OFF, node_pred_t, T_OFF, node_t, T_OFF, node_succ_t, T_OFF, label, L_OFF, suffix));
+		h.handle(TMP_31, TMP_OFF, node_pred_t, T_OFF, node_t, T_OFF, node_succ_t, T_OFF, label);
+		h.handle(TMP_31, TMP_OFF, node_pred_t, T_OFF, node_t, T_OFF, node_succ_t, T_OFF, label, L_OFF, suffix);
 
-		h.handle(encode(TMP_32, TMP_OFF, node_w, W_OFF, label));
-		h.handle(encode(TMP_32, TMP_OFF, node_w, W_OFF, label, L_OFF, suffix));
+		h.handle(TMP_32, TMP_OFF, node_w, W_OFF, label);
+		h.handle(TMP_32, TMP_OFF, node_w, W_OFF, label, L_OFF, suffix);
 	}
 
 	private static class FeatureVectorUpdater implements FeatureHandler {
@@ -324,12 +295,13 @@ public class EdgeFeaturizer {
 		}
 	}
 
-	private static int makePair(boolean b, int i) {
-		assert i >= 0;
-		return b ? i : -1 - i;
+	private static long makePair(boolean b, long i) {
+		return i << 1 | ((long) (b ? 1 : 0));
 	}
 
-	private static int makePair(boolean b1, boolean b2) {
-		return makePair(b1, b2 ? 1 : 0);
+	private static long makePair(boolean b1, boolean b2) {
+		long x1 = (long) (b1 ? 1 : 0);
+		long x2 = (long) (b2 ? 1 : 0);
+		return x2 << 1 | x1;
 	}
 }
