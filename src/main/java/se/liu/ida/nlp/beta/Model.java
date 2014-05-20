@@ -25,6 +25,9 @@ import java.util.zip.GZIPOutputStream;
  */
 public class Model implements Serializable {
 
+	public static final String BEG_TOKEN = "<BEG>";
+	public static final String END_TOKEN = "<END>";
+	public static final String MID_TOKEN = "<MID>";
 	private static final int NO_ENTRY = -1;
 	public static final String UNKNOWN_LABEL = "ROOT";
 	private final Table<String> forms;
@@ -39,7 +42,13 @@ public class Model implements Serializable {
 		this.forms = new Table<>();
 		this.lemmas = new Table<>();
 		this.cpostags = new Table<>();
+		cpostags.addEntry(BEG_TOKEN);
+		cpostags.addEntry(END_TOKEN);
+		cpostags.addEntry(MID_TOKEN);
 		this.postags = new Table<>();
+		postags.addEntry(BEG_TOKEN);
+		postags.addEntry(END_TOKEN);
+		postags.addEntry(MID_TOKEN);
 		this.deprels = new Table<>();
 		this.features = new TLongIntHashMap(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, 0, NO_ENTRY);
 		this.weightVector = null;

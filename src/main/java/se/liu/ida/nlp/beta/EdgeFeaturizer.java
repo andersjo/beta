@@ -12,9 +12,9 @@ import se.liu.ida.nlp.beta.conll.CoNLLTree;
 public class EdgeFeaturizer {
 
 	private static final int[] LIMITS = new int[]{1, 2, 3, 4, 5, 6, 11};
-	private final int T_OFF;
-	private final int W_OFF;
-	private final int L_OFF;
+	private static final int T_OFF = 0x08;
+	private static final int W_OFF = 0x10;
+	private static final int L_OFF = 0x08;
 	private final int BEG_T;
 	private final int END_T;
 	private final int MID_T;
@@ -29,19 +29,16 @@ public class EdgeFeaturizer {
 
 	public EdgeFeaturizer(Model model, CoNLLTree tree) {
 		int nForms = model.getNForms();
-		nForms += 1; // unknown word form
-		this.W_OFF = getNBits(nForms);
+		assert nForms <= Math.pow(2, W_OFF);
 
 		int nTags = model.getNPOSTags();
-		nTags += 1; // unknown word form
-		this.BEG_T = nTags + 0;
-		this.END_T = nTags + 1;
-		this.MID_T = nTags + 2;
-		nTags += 3;
-		this.T_OFF = getNBits(nTags);
+		this.BEG_T = model.getCodeForPOSTag(Model.BEG_TOKEN);
+		this.END_T = model.getCodeForPOSTag(Model.END_TOKEN);
+		this.MID_T = model.getCodeForPOSTag(Model.MID_TOKEN);
+		assert nTags <= Math.pow(2, T_OFF);
 
 		int nLabels = model.getNDeprels();
-		this.L_OFF = getNBits(nLabels);
+		assert nLabels <= Math.pow(2, L_OFF);
 
 		int nNodes = tree.getNNodes();
 
@@ -87,7 +84,7 @@ public class EdgeFeaturizer {
 		}
 		return featureVector;
 	}
-	private static final int TMP_OFF = getNBits(33);
+	private static final int TMP_OFF = 0x08;
 	private static final int TMP_00 = 0;
 	private static final int TMP_01 = 1;
 	private static final int TMP_02 = 2;
@@ -123,7 +120,7 @@ public class EdgeFeaturizer {
 	private static final int TMP_32 = 32;
 
 	public void featurizeCore(int fst, int snd, boolean isRA, FeatureHandler h) {
-		long attDist = makePair(isRA, quantize(snd - fst, LIMITS));
+		long attDist = makePair(isRA, quantize(snd - fst, LIMITS)) << 1 | 1;
 
 		int fst_t = t[fst];
 		int snd_t = t[snd];
@@ -224,7 +221,7 @@ public class EdgeFeaturizer {
 	}
 
 	public void featurizeLabeled(int node, int label, boolean isRA, boolean isTarget, FeatureHandler h) {
-		long suffix = makePair(isRA, isTarget);
+		long suffix = makePair(isRA, isTarget) << 1 | 1;
 
 		int node_w = w[node];
 		int node_t = t[node];
@@ -296,7 +293,7 @@ public class EdgeFeaturizer {
 	}
 
 	private static long makePair(boolean b, long i) {
-		return i << 1 | ((long) (b ? 1 : 0));
+		return i << 1 | (long) (b ? 1 : 0);
 	}
 
 	private static long makePair(boolean b1, boolean b2) {
